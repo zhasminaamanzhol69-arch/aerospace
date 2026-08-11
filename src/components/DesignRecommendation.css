@@ -1,0 +1,40 @@
+.material-analysis {
+  border-top: 1px solid rgba(30, 58, 82, 0.92);
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+}
+
+.material-analysis__grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.material-analysis__item {
+  background: rgba(7, 17, 31, 0.5);
+  border: 1px solid rgba(30, 58, 82, 0.9);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.material-analysis__item h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.material-analysis__item p {
+  color: var(--soft);
+  font-size: 13px;
+  line-height: 1.45;
+  margin-top: 6px;
+}
+
+.material-analysis__item span {
+  color: var(--ink);
+}
+
+@media (max-width: 760px) {
+  .material-analysis__grid { grid-template-columns: 1fr; }
+}

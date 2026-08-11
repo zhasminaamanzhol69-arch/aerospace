@@ -1,5 +1,12 @@
 .mission-page { display: flex; flex-direction: column; gap: 24px; }
 
+.top-bar {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
 .mission-hero {
   display: grid;
   align-items: center;

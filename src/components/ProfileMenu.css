@@ -1,0 +1,70 @@
+.profile-menu {
+  position: relative;
+}
+
+.profile-menu__button {
+  align-items: center;
+  background: rgba(7, 17, 31, 0.58);
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  border-radius: 8px;
+  color: var(--accent);
+  display: flex;
+  height: 42px;
+  justify-content: center;
+  padding: 0;
+  width: 42px;
+}
+
+.profile-menu__button span {
+  align-items: center;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 50%;
+  display: flex;
+  font-size: 14px;
+  font-weight: 900;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+
+.profile-menu__panel {
+  background: linear-gradient(180deg, rgba(17, 38, 58, 0.98), rgba(13, 27, 42, 0.98));
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  border-radius: 8px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+  padding: 14px;
+  position: absolute;
+  right: 0;
+  top: 50px;
+  z-index: 10;
+}
+
+.profile-menu__panel h3 {
+  font-size: 18px;
+}
+
+.profile-menu__panel p {
+  color: var(--soft);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.profile-menu__logout {
+  align-items: center;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.32);
+  color: #fecaca;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 6px;
+  padding: 10px 12px;
+}
+
+.profile-menu__logout span {
+  font-size: 16px;
+  line-height: 1;
+}

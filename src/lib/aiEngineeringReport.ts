@@ -1,5 +1,8 @@
 import { isSupabaseConfigured, supabase } from './supabase';
 import type { CalculatedParameters, DesignOption, MissionRequirements } from './aerospace';
+import { buildEngineeringPrompt } from './aiEngineeringPrompt';
+import type { EngineeringStage } from './engineeringStage';
+import { buildFallbackEngineeringReport } from './fallbackEngineeringReport';
 import type { Language } from './language';
 
 type AiResponse = {
@@ -7,89 +10,80 @@ type AiResponse = {
   error?: string;
 };
 
-export async function generateEngineeringReport(
-  requirements: MissionRequirements,
-  parameters: CalculatedParameters,
-  options: DesignOption[],
-  language: Language,
-) {
-  if (!isSupabaseConfigured) {
-    throw new Error('Supabase не настроен, поэтому AI-отчёт пока недоступен.');
-  }
-
-  const { data, error } = await supabase.functions.invoke<AiResponse>('ai', {
-    body: {
-      system: [
-        'Ты инженерный AI-агент для учебного aerospace-приложения.',
-        `Отвечай на языке: ${languageName[language]}.`,
-        'Пиши кратко, понятно и профессионально.',
-        'Не обещай реальную сертификацию и не выдавай расчёты за готовый промышленный проект.',
-      ].join(' '),
-      prompt: buildPrompt(requirements, parameters, options, language),
-    },
-  });
-
-  if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
-  if (!data?.text) throw new Error('AI не вернул текст отчёта.');
-
-  return data.text;
-}
-
 const languageName: Record<Language, string> = {
   kk: 'казахский',
   ru: 'русский',
   en: 'английский',
 };
 
-function buildPrompt(
+export async function generateEngineeringReport(
   requirements: MissionRequirements,
   parameters: CalculatedParameters,
   options: DesignOption[],
   language: Language,
+  stage: EngineeringStage,
+  userQuestion: string,
 ) {
-  const best = options[0];
-  const optionLines = options
-    .map(
-      (option) =>
-        `- ${option.name}: score ${option.score}%, mass ${option.massKg} kg, power ${option.powerW} W, risk ${option.risk}`,
-    )
-    .join('\n');
+  if (!isSupabaseConfigured) {
+    return buildFallbackEngineeringReport(requirements, parameters, options, language, stage, userQuestion);
+  }
 
-  return `
-Задача: сделать инженерный вывод после анализа требований к UAV.
-Язык ответа: ${languageName[language]}.
+  try {
+    const { data, error } = await supabase.functions.invoke<AiResponse>('ai', {
+      body: {
+        system: buildSystemPrompt(language),
+        prompt: buildEngineeringPrompt(requirements, parameters, options, language, stage, userQuestion),
+      },
+    });
 
-Требования:
-- полезная нагрузка: ${requirements.payloadKg} кг
-- время полёта: ${requirements.enduranceHours} ч
-- дальность: ${requirements.rangeKm} км
-- скорость: ${requirements.speedKmh} км/ч
-- двигатель: ${requirements.engineType}
-- материал: ${requirements.material}
-- источник энергии: ${requirements.energySource}
-- среда эксплуатации: ${requirements.environment}
+    if (error) throw new Error(await getFunctionErrorMessage(error));
+    if (data?.error) throw new Error(data.error);
+    if (!data?.text) throw new Error('AI не вернул текст отчёта.');
 
-Рассчитанные необходимые параметры:
-- расчётная взлётная масса: ${parameters.estimatedTakeoffMassKg} кг
-- необходимая мощность: ${parameters.requiredPowerW} W
-- запас энергии: ${parameters.requiredEnergyWh} Wh
-- резерв батареи: ${parameters.batteryReservePercent}%
-- расчётная нагрузка: ${parameters.designLoadKg} кг
-- уровень риска: ${parameters.riskLevel}
-- совет по материалу: ${parameters.materialAdvice}
-- совет по источнику энергии: ${parameters.energyAdvice}
-- эксплуатационный совет: ${parameters.operationAdvice}
+    return data.text;
+  } catch {
+    return buildFallbackEngineeringReport(requirements, parameters, options, language, stage, userQuestion);
+  }
+}
 
-Рассчитанные варианты:
-${optionLines}
+function buildSystemPrompt(language: Language) {
+  return [
+    'Ты Aerospace Engineering Agent: экспертный инженерный ассистент для авиации, UAV и космических аппаратов.',
+    'Работай на этапах Жобалау / Проектирование, Дайындау / Производство, Пайдалану / Эксплуатация.',
+    `Отвечай на языке: ${languageName[language]}.`,
+    'Всегда указывай этап решения и отвечай строго по заданному шаблону с двуязычными заголовками.',
+    'Ссылайся только на реальные нормативно-технические документы: ECSS, NASA Technical Standards, ISO, ГОСТ, FAA, ЕСКД или другие релевантные стандарты.',
+    'Номера пунктов, разделов, таблиц, коэффициенты, прочность, допуски и лимиты приводи только если они есть в доступном контексте или ты точно знаешь источник.',
+    'Если точных нормативных данных нет, напиши: "В имеющихся нормативных документах нет точной информации по данному запросу."',
+    'Текущие Mission Requirements используй как дополнительный контекст, только если они подходят к вопросу.',
+    'Не обещай реальную сертификацию и не выдавай учебные расчёты за готовый промышленный проект.',
+  ].join(' ');
+}
 
-Лучший вариант по локальному расчёту: ${best.name}.
+async function getFunctionErrorMessage(error: unknown) {
+  const fallback = error instanceof Error ? error.message : 'Не получилось обратиться к AI.';
 
-Сформируй ответ в 4 коротких разделах:
-1. Вывод
-2. Рассчитанные параметры и что они означают
-3. Риски
-4. Рекомендуемое инженерное решение
-`.trim();
+  if (!hasContext(error) || !(error.context instanceof Response)) return fallback;
+
+  try {
+    const body = (await error.context.clone().json()) as unknown;
+    if (hasStringError(body)) return body.error;
+  } catch {
+    return fallback;
+  }
+
+  return fallback;
+}
+
+function hasContext(value: unknown): value is { context: unknown } {
+  return typeof value === 'object' && value !== null && 'context' in value;
+}
+
+function hasStringError(value: unknown): value is { error: string } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'error' in value &&
+    typeof value.error === 'string'
+  );
 }

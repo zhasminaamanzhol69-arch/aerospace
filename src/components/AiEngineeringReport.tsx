@@ -1,63 +1,25 @@
 import { useEffect, useState } from 'react';
 import { generateEngineeringReport } from '../lib/aiEngineeringReport';
+import { aiReportText } from '../lib/aiEngineeringReportText';
 import type { CalculatedParameters, DesignOption, MissionRequirements } from '../lib/aerospace';
-import { useLanguage, type Language } from '../lib/language';
+import type { EngineeringStage } from '../lib/engineeringStage';
+import { useLanguage } from '../lib/language';
 import './AiEngineeringReport.css';
 
 type Props = {
+  stage: EngineeringStage;
   requirements: MissionRequirements;
   parameters: CalculatedParameters;
   options: DesignOption[];
 };
 
-const text: Record<Language, {
-  title: string;
-  loading: string;
-  update: string;
-  generate: string;
-  failed: string;
-  base: string;
-  placeholder: string;
-  risk: Record<string, string>;
-}> = {
-  kk: {
-    title: 'Есептелген параметрлер бойынша AI қорытынды',
-    loading: 'AI талдап жатыр…',
-    update: 'Қорытындыны жаңарту',
-    generate: 'Қорытынды жасау',
-    failed: 'AI-қорытындыны жасау мүмкін болмады.',
-    base: 'Қорытынды негізі',
-    placeholder: 'Батырманы басыңыз: AI есептелген параметрлерді түсіндіріп, инженерлік шешім мен тәуекелдерді көрсетеді.',
-    risk: { Low: 'Төмен', Medium: 'Орташа', High: 'Жоғары' },
-  },
-  ru: {
-    title: 'AI-вывод по рассчитанным параметрам',
-    loading: 'AI анализирует…',
-    update: 'Обновить вывод',
-    generate: 'Сформировать выводы',
-    failed: 'AI-отчёт не удалось сформировать.',
-    base: 'Основа вывода',
-    placeholder: 'Нажми кнопку, и AI объяснит рассчитанные параметры, предложит инженерное решение и покажет риски по текущим Mission Requirements.',
-    risk: { Low: 'Low', Medium: 'Medium', High: 'High' },
-  },
-  en: {
-    title: 'AI report based on calculated parameters',
-    loading: 'AI is analyzing…',
-    update: 'Update report',
-    generate: 'Generate report',
-    failed: 'Could not generate the AI report.',
-    base: 'Report basis',
-    placeholder: 'Press the button and AI will explain the calculated parameters, propose an engineering solution, and show risks for the current Mission Requirements.',
-    risk: { Low: 'Low', Medium: 'Medium', High: 'High' },
-  },
-};
-
-export function AiEngineeringReport({ requirements, parameters, options }: Props) {
+export function AiEngineeringReport({ stage, requirements, parameters, options }: Props) {
   const { language } = useLanguage();
+  const [question, setQuestion] = useState('');
   const [report, setReport] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const copy = text[language];
+  const copy = aiReportText[language];
   const best = options[0];
 
   useEffect(() => {
@@ -66,12 +28,25 @@ export function AiEngineeringReport({ requirements, parameters, options }: Props
   }, [language, parameters, requirements]);
 
   async function handleGenerate() {
+    const trimmedQuestion = question.trim();
+    if (!trimmedQuestion) {
+      setError(copy.emptyQuestion);
+      return;
+    }
+
     setIsLoading(true);
     setError('');
     setReport('');
 
     try {
-      const nextReport = await generateEngineeringReport(requirements, parameters, options, language);
+      const nextReport = await generateEngineeringReport(
+        requirements,
+        parameters,
+        options,
+        language,
+        stage,
+        trimmedQuestion,
+      );
       setReport(nextReport);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : copy.failed);
@@ -86,10 +61,8 @@ export function AiEngineeringReport({ requirements, parameters, options }: Props
         <div>
           <p className="eyebrow">AI Engineering Report</p>
           <h2>{copy.title}</h2>
+          <p className="ai-report__subtitle">{copy.subtitle}</p>
         </div>
-        <button type="button" onClick={handleGenerate} disabled={isLoading}>
-          {isLoading ? copy.loading : report ? copy.update : copy.generate}
-        </button>
       </div>
 
       <div className="ai-report__params">
@@ -99,9 +72,30 @@ export function AiEngineeringReport({ requirements, parameters, options }: Props
         <strong>{copy.risk[best.risk]}</strong>
       </div>
 
+      <label className="ai-report__input">
+        <span>{copy.inputLabel}</span>
+        <textarea
+          onChange={(event) => setQuestion(event.target.value)}
+          placeholder={copy.inputPlaceholder}
+          rows={4}
+          value={question}
+        />
+      </label>
+
+      <button type="button" onClick={handleGenerate} disabled={isLoading}>
+        {isLoading ? copy.loading : copy.ask}
+      </button>
+
       {error && <p className="message">{error}</p>}
       {report ? (
-        <p className="ai-report__text">{report}</p>
+        <article className="ai-report__result">
+          <div className="ai-report__flow" aria-label="AI report structure">
+            <span>Решение</span>
+            <span>Нормативы / Стандарты</span>
+            <span>Риски</span>
+          </div>
+          <p className="ai-report__text">{report}</p>
+        </article>
       ) : (
         <p className="ai-report__placeholder">{copy.placeholder}</p>
       )}

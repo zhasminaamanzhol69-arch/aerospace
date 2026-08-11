@@ -1,0 +1,89 @@
+import type { Language } from './language';
+
+export const inputNumberFields = [
+  'payloadKg',
+  'payloadPowerW',
+  'rangeKm',
+  'enduranceHours',
+  'altitudeKm',
+  'takeoffMassKg',
+  'maxDimensionM',
+  'productionVolume',
+  'batterySohPercent',
+  'motorTempC',
+  'flightHours',
+  'linkRssiDbm',
+  'satelliteCount',
+  'telemetryLatencyMs',
+  'solarArrayW',
+  'radiationToleranceKrad',
+  'resourcePercent',
+] as const;
+
+export type MissionInputCopy = {
+  title: string;
+  labels: Record<(typeof inputNumberFields)[number], string>;
+  scheme: string;
+  material: string;
+  method: string;
+  environment: string;
+  missionMode: string;
+  orbit: string;
+  thermal: string;
+  joint: string;
+  scale: string;
+  checkType: string;
+  checklist: string;
+  options: Record<string, string>;
+};
+
+export const missionInputText: Record<Language, MissionInputCopy> = {
+  kk: {
+    title: 'Бастапқы талаптар',
+    labels: { payloadKg: 'Пайдалы жүк, кг', payloadPowerW: 'Жүктеме қуаты, Вт', rangeKm: 'Қашықтық, км', enduranceHours: 'Ұшу уақыты, сағ', altitudeKm: 'Биіктік/орбита, км', takeoffMassKg: 'MTOW лимиті, кг', maxDimensionM: 'Габарит лимиті, м', productionVolume: 'Серия көлемі', batterySohPercent: 'Battery SoH, %', motorTempC: 'Қозғалтқыш температурасы, °C', flightHours: 'Наработка, сағ', linkRssiDbm: 'RSSI, dBm', satelliteCount: 'GPS/Galileo саны', telemetryLatencyMs: 'Телеметрия кідірісі, ms', solarArrayW: 'Күн панелі, W', radiationToleranceKrad: 'Радиация төзімділігі, krad', resourcePercent: 'Аккумулятор/отын ресурсы, %' },
+    scheme: 'Аппарат схемасы',
+    material: 'Материал',
+    method: 'Формалау/өңдеу әдісі',
+    environment: 'Пайдалану ортасы',
+    missionMode: 'Миссия режимі',
+    orbit: 'Орбита',
+    thermal: 'Термореттеу',
+    joint: 'Қосу әдісі',
+    scale: 'Серия түрі',
+    checkType: 'Тексеру түрі',
+    checklist: 'Ұшу алдындағы чек-лист',
+    options: { 'fixed-wing': 'Самолет / Fixed Wing', multirotor: 'Мультиротор', 'hybrid-vtol': 'Гибрид / VTOL', 'cubesat-satellite': 'CubeSat / Satellite', leo: 'LEO', geo: 'GEO', sso: 'SSO', passive: 'Пассивті терморегтеу', active: 'Активті терморегтеу', carbon: 'Углепластик / CFRP', 'aluminum-2024': 'Al-Li 2024', 'aluminum-7075': 'Al 7075-T6', titanium: 'Ti-6Al-4V', petg: '3D PETG', pa12: '3D PA12', 'dmls-metal': 'DMLS металл', cnc: 'ЧПУ-фрезерование', autoclave: 'Автоклав композитов', 'vacuum-infusion': 'Вакуумное инфузирование', 'additive-polymer': '3D-печать полимер', dmls: 'DMLS металл', welding: 'Сварка', 'laser-welding': 'Лазерная сварка', 'tig-welding': 'Аргонодуговая сварка', 'friction-welding': 'Сварка трением', riveting: 'Клепка', adhesive: 'Адгезивное склеивание', prototype: 'Прототип 1–3 шт.', 'small-batch': 'Мелкосерия 10–50 шт.', serial: 'Серийное производство', normal: 'Қалыпты жағдай', cold: '−40°C суық', wind: '>12 м/с жел', space: 'Вакуум + радиация', waypoint: 'Waypoint mission', fpv: 'FPV қолмен басқару', orbital: 'Орбиталық маневр', regular: 'Регулярное ТО', 'hard-landing': 'Жесткая посадкадан кейін', preflight: 'Pre-flight checklist', ready: 'Толық дайын', partial: 'Ішінара дайын', blocked: 'Дайын емес' },
+  },
+  ru: {
+    title: 'Начальные требования',
+    labels: { payloadKg: 'Полезная нагрузка, кг', payloadPowerW: 'Потребление payload, Вт', rangeKm: 'Дальность, км', enduranceHours: 'Время в воздухе, ч', altitudeKm: 'Высота или орбита, км', takeoffMassKg: 'Лимит MTOW, кг', maxDimensionM: 'Лимит габарита, м', productionVolume: 'Объём серии', batterySohPercent: 'SoH аккумулятора, %', motorTempC: 'Температура двигателей, °C', flightHours: 'Наработка, ч', linkRssiDbm: 'RSSI, dBm', satelliteCount: 'GPS/Galileo спутники', telemetryLatencyMs: 'Задержка телеметрии, ms', solarArrayW: 'Солнечные панели, W', radiationToleranceKrad: 'Радстойкость, krad', resourcePercent: 'Ресурс аккумулятора/топлива, %' },
+    scheme: 'Схема аппарата',
+    material: 'Материал',
+    method: 'Метод формования/обработки',
+    environment: 'Среда эксплуатации',
+    missionMode: 'Режим миссии',
+    orbit: 'Орбита',
+    thermal: 'Терморегулирование',
+    joint: 'Метод соединения',
+    scale: 'Серийность',
+    checkType: 'Тип проверки',
+    checklist: 'Предполётный чек-лист',
+    options: { 'fixed-wing': 'Самолет / Fixed Wing', multirotor: 'Мультиротор / Multirotor', 'hybrid-vtol': 'Гибрид / VTOL', 'cubesat-satellite': 'CubeSat / Satellite', leo: 'LEO', geo: 'GEO', sso: 'SSO', passive: 'Пассивное терморегулирование', active: 'Активное терморегулирование', carbon: 'Углепластик / CFRP', 'aluminum-2024': 'Al-Li 2024', 'aluminum-7075': 'Al 7075-T6', titanium: 'Ti-6Al-4V', petg: '3D-печать PETG', pa12: '3D-печать PA12', 'dmls-metal': 'DMLS металл', cnc: 'ЧПУ-фрезерование', autoclave: 'Автоклавное формование композитов', 'vacuum-infusion': 'Вакуумное инфузирование', 'additive-polymer': 'Аддитивное производство', dmls: 'DMLS металл', welding: 'Сварка', 'laser-welding': 'Лазерная сварка', 'tig-welding': 'Аргонодуговая сварка', 'friction-welding': 'Сварка трением', riveting: 'Клёпка', adhesive: 'Клеевые и адгезивные соединения', prototype: 'Прототип 1–3 шт.', 'small-batch': 'Мелкосерийное 10–50 шт.', serial: 'Серийное производство', normal: 'Нормальные условия', cold: 'Экстремальный холод −40°C', wind: 'Сильный ветер >12 м/с', space: 'Вакуум и радиация', waypoint: 'Автономный Waypoint mission', fpv: 'Ручное управление FPV', orbital: 'Орбитальное маневрирование', regular: 'Регулярное ТО', 'hard-landing': 'После жесткой посадки', preflight: 'Pre-flight checklist', ready: 'Готов', partial: 'Частично готов', blocked: 'Не готов' },
+  },
+  en: {
+    title: 'Initial requirements',
+    labels: { payloadKg: 'Payload, kg', payloadPowerW: 'Payload power, W', rangeKm: 'Range, km', enduranceHours: 'Endurance, h', altitudeKm: 'Altitude/orbit, km', takeoffMassKg: 'MTOW limit, kg', maxDimensionM: 'Size limit, m', productionVolume: 'Series volume', batterySohPercent: 'Battery SoH, %', motorTempC: 'Motor temp, °C', flightHours: 'Flight hours', linkRssiDbm: 'RSSI, dBm', satelliteCount: 'GPS/Galileo satellites', telemetryLatencyMs: 'Telemetry latency, ms', solarArrayW: 'Solar array, W', radiationToleranceKrad: 'Radiation tolerance, krad', resourcePercent: 'Battery/fuel resource, %' },
+    scheme: 'Vehicle scheme',
+    material: 'Material',
+    method: 'Forming/machining method',
+    environment: 'Operating environment',
+    missionMode: 'Mission mode',
+    orbit: 'Orbit',
+    thermal: 'Thermal control',
+    joint: 'Joining method',
+    scale: 'Production scale',
+    checkType: 'Check type',
+    checklist: 'Preflight checklist',
+    options: { 'fixed-wing': 'Aircraft / Fixed Wing', multirotor: 'Multirotor', 'hybrid-vtol': 'Hybrid / VTOL', 'cubesat-satellite': 'CubeSat / Satellite', leo: 'LEO', geo: 'GEO', sso: 'SSO', passive: 'Passive thermal control', active: 'Active thermal control', carbon: 'CFRP', 'aluminum-2024': 'Al-Li 2024', 'aluminum-7075': 'Al 7075-T6', titanium: 'Ti-6Al-4V', petg: '3D PETG', pa12: '3D PA12', 'dmls-metal': 'DMLS metal', cnc: 'CNC milling', autoclave: 'Composite autoclave molding', 'vacuum-infusion': 'Vacuum infusion', 'additive-polymer': 'Additive manufacturing', dmls: 'DMLS metal', welding: 'Welding', 'laser-welding': 'Laser welding', 'tig-welding': 'TIG welding', 'friction-welding': 'Friction welding', riveting: 'Riveting', adhesive: 'Adhesive bonding', prototype: 'Prototype 1–3 pcs', 'small-batch': 'Small batch 10–50 pcs', serial: 'Serial production', normal: 'Normal conditions', cold: 'Extreme cold −40°C', wind: 'Strong wind >12 m/s', space: 'Vacuum and radiation', waypoint: 'Autonomous waypoint mission', fpv: 'Manual FPV control', orbital: 'Orbital maneuvering', regular: 'Regular maintenance', 'hard-landing': 'After hard landing', preflight: 'Pre-flight checklist', ready: 'Ready', partial: 'Partly ready', blocked: 'Blocked' },
+  },
+};

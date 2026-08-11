@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { CalculatedParameters, MissionRequirements } from '../lib/aerospace';
 import { useLanguage, type Language } from '../lib/language';
 import './DigitalTwinPanel.css';
 
@@ -8,9 +9,14 @@ type Step = {
   purpose: string;
 };
 
+type Props = {
+  parameters: CalculatedParameters;
+  requirements: MissionRequirements;
+};
+
 const text: Record<Language, { title: string; body: string; purposeTitle: string; steps: Step[] }> = {
   kk: {
-    title: 'Нақты аппараттан инженерлік шешімге',
+    title: 'Пайдалану және телеметрия',
     body: 'Виртуалды модель температураны, батареяны, массаны және ұшу режимін бақылайды, содан кейін алдын ала техникалық шешім ұсынады.',
     purposeTitle: 'Бұл не үшін керек',
     steps: [
@@ -22,7 +28,7 @@ const text: Record<Language, { title: string; body: string; purposeTitle: string
     ],
   },
   ru: {
-    title: 'От реального аппарата к инженерному решению',
+    title: 'Эксплуатация и телеметрия Digital Twin',
     body: 'Виртуальная модель отслеживает температуру, батарею, массу и режим полёта, а затем заранее предлагает техническое решение.',
     purposeTitle: 'Для чего это предназначено',
     steps: [
@@ -34,7 +40,7 @@ const text: Record<Language, { title: string; body: string; purposeTitle: string
     ],
   },
   en: {
-    title: 'From a real vehicle to an engineering decision',
+    title: 'Operations and Digital Twin Telemetry',
     body: 'The virtual model tracks temperature, battery, mass, and flight mode, then suggests a technical decision in advance.',
     purposeTitle: 'What it is for',
     steps: [
@@ -47,17 +53,41 @@ const text: Record<Language, { title: string; body: string; purposeTitle: string
   },
 };
 
-export function DigitalTwinPanel() {
+export function DigitalTwinPanel({ parameters, requirements }: Props) {
   const { language } = useLanguage();
-  const copy = text[language];
+  const copy = getDomainCopy(text[language], requirements.vehicleDomain, language);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedStep = copy.steps[selectedIndex];
+  const isSpacecraft = requirements.vehicleDomain === 'spacecraft';
+  const prediction = buildPrediction(parameters, isSpacecraft);
+  const telemetry = isSpacecraft
+    ? `Orbit ${requirements.orbitClass.toUpperCase()} / Solar ${requirements.solarArrayW}W / Rad ${requirements.radiationToleranceKrad}krad`
+    : `Temp ${requirements.motorTempC}°C / Batt ${requirements.batteryVoltageV}V / Vib ${requirements.vibrationG}g`;
+  const twinState = isSpacecraft ? `Power ${parameters.requiredEnergyWh}Wh / Link ${parameters.linkQualityPercent}%` : `SoH ${requirements.batterySohPercent}% / Link ${parameters.linkQualityPercent}%`;
 
   return (
     <section className="card twin-panel">
       <div>
-        <p className="eyebrow">Digital Twin + AI Agent</p>
+        <p className="eyebrow">Operations & Digital Twin Telemetry</p>
         <h2>{copy.title}</h2>
+      </div>
+      <div className="telemetry-chain" aria-label="Operations telemetry chain">
+        <article>
+          <strong>REAL VEHICLE</strong>
+          <span>{isSpacecraft ? 'CubeSat / Satellite' : requirements.vehicleScheme}</span>
+        </article>
+        <article>
+          <strong>TELEMETRY 50 Hz</strong>
+          <span>{telemetry}</span>
+        </article>
+        <article>
+          <strong>DIGITAL TWIN</strong>
+          <span>{twinState}</span>
+        </article>
+        <article>
+          <strong>AI FORECAST</strong>
+          <span>{prediction}</span>
+        </article>
       </div>
       <div className="twin-diagram" aria-label="Digital twin process">
         {copy.steps.map((step, index) => (
@@ -79,4 +109,50 @@ export function DigitalTwinPanel() {
       </article>
     </section>
   );
+}
+
+function buildPrediction(parameters: CalculatedParameters, isSpacecraft: boolean) {
+  if (parameters.anomalyStatus !== 'OK') {
+    return isSpacecraft ? 'Warning: check power/thermal link before next pass' : 'Warning: check thermal/link before next flight';
+  }
+
+  return isSpacecraft ? `No anomaly / orbit service in ${parameters.serviceLifeHours} h` : `Аномалий не обнаружено / service in ${parameters.serviceLifeHours} h`;
+}
+
+function getDomainCopy(copy: typeof text.ru, domain: MissionRequirements['vehicleDomain'], language: Language) {
+  if (domain === 'aviation') return copy;
+
+  const spacecraftSteps: Record<Language, Step[]> = {
+    kk: [
+      { label: 'Real Spacecraft', description: 'Бұл нақты CubeSat, спутник немесе ғарыштық пайдалы жүктеме.', purpose: 'Орбиталық аппараттан бастапқы телеметрияны алу үшін керек.' },
+      { label: 'Telemetry', description: 'Аппарат жіберетін деректер: орбита, қуат балансы, байланыс, температура және радиациялық орта.', purpose: 'Ғарыштық жүйенің күйін нақты уақытта бағалау үшін керек.' },
+      { label: 'Digital Twin', description: 'Виртуалды модель спутниктің орбиталық және жылулық күйін қайталайды.', purpose: 'Вакуум, термоцикл және қуат тәуекелдерін қауіпсіз талдау үшін керек.' },
+      { label: 'Prediction', description: 'AI энергия тапшылығын, байланыс үзілуін немесе қызу қаупін болжайды.', purpose: 'Келесі байланыс сеансына дейін ақауды алдын ала көру үшін керек.' },
+      { label: 'Engineering Decision', description: 'Инженерге ұсыныс: қуат режимін өзгерту, жүктемені шектеу немесе термоконтурды түзету.', purpose: 'Орбиталық миссияны қауіпсіз жалғастыру үшін керек.' },
+    ],
+    ru: [
+      { label: 'Real Spacecraft', description: 'Это реальный CubeSat, спутник или космическая полезная нагрузка.', purpose: 'Нужен как источник настоящей орбитальной телеметрии.' },
+      { label: 'Telemetry', description: 'Это поток данных: орбита, энергобаланс, связь, температура и радиационная среда.', purpose: 'Нужна, чтобы видеть состояние космической системы в реальном времени.' },
+      { label: 'Digital Twin', description: 'Виртуальная модель повторяет орбитальное и тепловое состояние спутника.', purpose: 'Нужен, чтобы безопасно анализировать вакуум, термоциклы и энергетические риски.' },
+      { label: 'Prediction', description: 'AI прогнозирует нехватку энергии, потерю связи или риск перегрева.', purpose: 'Нужен, чтобы заметить проблему до следующего сеанса связи.' },
+      { label: 'Engineering Decision', description: 'Рекомендация инженеру: изменить режим питания, ограничить нагрузку или скорректировать термоконтур.', purpose: 'Нужна, чтобы безопасно продолжать орбитальную миссию.' },
+    ],
+    en: [
+      { label: 'Real Spacecraft', description: 'The physical CubeSat, satellite, or space payload.', purpose: 'It provides real orbital telemetry.' },
+      { label: 'Telemetry', description: 'Live data: orbit, power balance, link, temperature, and radiation environment.', purpose: 'It monitors spacecraft health in real time.' },
+      { label: 'Digital Twin', description: 'A virtual model that mirrors orbital and thermal spacecraft state.', purpose: 'It safely analyzes vacuum, thermal cycling, and power risks.' },
+      { label: 'Prediction', description: 'AI forecasts energy shortage, link loss, or overheating risk.', purpose: 'It detects issues before the next communication pass.' },
+      { label: 'Engineering Decision', description: 'A recommendation to adjust power mode, limit payload, or tune thermal control.', purpose: 'It keeps the orbital mission within safe limits.' },
+    ],
+  };
+
+  return {
+    ...copy,
+    body: {
+      kk: 'Виртуалды модель орбитаны, қуат балансын, байланысты және жылу режимін бақылайды, содан кейін спутникке техникалық шешім ұсынады.',
+      ru: 'Виртуальная модель отслеживает орбиту, энергобаланс, связь и тепловой режим, затем предлагает техническое решение для спутника.',
+      en: 'The virtual model tracks orbit, power balance, link status, and thermal mode, then suggests a spacecraft engineering decision.',
+    }[language],
+    steps: spacecraftSteps[language],
+  };
 }

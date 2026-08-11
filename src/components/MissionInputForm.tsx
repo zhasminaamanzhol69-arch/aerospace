@@ -1,57 +1,25 @@
+import type { ReactNode } from 'react';
 import type { MissionRequirements } from '../lib/aerospace';
-import { useLanguage, type Language } from '../lib/language';
-import { MissionAiHelp } from './MissionAiHelp';
+import type { EngineeringStage } from '../lib/engineeringStage';
+import { getMissionInputFields } from '../lib/missionInputFields';
+import {
+  inputNumberFields,
+  missionInputText,
+  type MissionInputCopy,
+} from '../lib/missionInputText';
+import { useLanguage } from '../lib/language';
 
 type Props = {
+  stage: EngineeringStage;
   requirements: MissionRequirements;
   onChange: (next: MissionRequirements) => void;
 };
 
-const fields = ['payloadKg', 'enduranceHours', 'rangeKm', 'speedKmh'] as const;
-
-const text: Record<Language, {
-  title: string;
-  labels: Record<(typeof fields)[number], string>;
-  engine: string;
-  material: string;
-  energy: string;
-  environment: string;
-  options: Record<string, string>;
-}> = {
-  kk: {
-    title: 'Бастапқы талаптар',
-    labels: { payloadKg: 'Пайдалы жүк, кг', enduranceHours: 'Ұшу уақыты, сағ', rangeKm: 'Қашықтық, км', speedKmh: 'Жылдамдық, км/сағ' },
-    engine: 'Қозғалтқыш',
-    material: 'Материал',
-    energy: 'Энергия көзі',
-    environment: 'Пайдалану ортасы',
-    options: { electric: 'Электрлік', hybrid: 'Гибридті', turbine: 'Микротурбина', carbon: 'Көміртекті композит', aluminum: 'Авиациялық алюминий', titanium: 'Титан рама', 'li-ion': 'Li-ion батарея', 'fuel-cell': 'Сутек отын элементі', solar: 'Күн энергиясы көмегі', cold: 'Суық / жел', desert: 'Ыстық / шаң', urban: 'Қалалық дәліз' },
-  },
-  ru: {
-    title: 'Начальные требования',
-    labels: { payloadKg: 'Полезная нагрузка, кг', enduranceHours: 'Время полёта, ч', rangeKm: 'Дальность, км', speedKmh: 'Скорость, км/ч' },
-    engine: 'Двигатель',
-    material: 'Материал',
-    energy: 'Источник энергии',
-    environment: 'Среда эксплуатации',
-    options: { electric: 'Электрический', hybrid: 'Гибридный', turbine: 'Микротурбина', carbon: 'Углепластик', aluminum: 'Авиационный алюминий', titanium: 'Титановая рама', 'li-ion': 'Li-ion батарея', 'fuel-cell': 'Водородный топливный элемент', solar: 'Солнечная поддержка', cold: 'Холод / ветер', desert: 'Жара / пыль', urban: 'Городской коридор' },
-  },
-  en: {
-    title: 'Initial requirements',
-    labels: { payloadKg: 'Payload, kg', enduranceHours: 'Flight time, h', rangeKm: 'Range, km', speedKmh: 'Speed, km/h' },
-    engine: 'Engine',
-    material: 'Material',
-    energy: 'Energy source',
-    environment: 'Operating environment',
-    options: { electric: 'Electric', hybrid: 'Hybrid', turbine: 'Micro turbine', carbon: 'Carbon composite', aluminum: 'Aerospace aluminum', titanium: 'Titanium frame', 'li-ion': 'Li-ion battery', 'fuel-cell': 'Hydrogen fuel cell', solar: 'Solar assist', cold: 'Cold / wind', desert: 'Hot / dust', urban: 'Urban corridor' },
-  },
-};
-
-export function MissionInputForm({ requirements, onChange }: Props) {
+export function MissionInputForm({ stage, requirements, onChange }: Props) {
   const { language } = useLanguage();
-  const copy = text[language];
+  const copy = missionInputText[language];
 
-  function updateNumber(field: (typeof fields)[number], value: string) {
+  function updateNumber(field: (typeof inputNumberFields)[number], value: string) {
     onChange({ ...requirements, [field]: Number(value) });
   }
 
@@ -63,9 +31,8 @@ export function MissionInputForm({ requirements, onChange }: Props) {
     <section className="card mission-card">
       <p className="eyebrow">Mission Requirements</p>
       <h2>{copy.title}</h2>
-      <MissionAiHelp requirements={requirements} />
       <div className="field-grid">
-        {fields.map((field) => (
+        {getMissionInputFields(stage, requirements.vehicleDomain).map((field) => (
           <label className="field" key={field}>
             <span>{copy.labels[field]}</span>
             <input
@@ -77,51 +44,135 @@ export function MissionInputForm({ requirements, onChange }: Props) {
             />
           </label>
         ))}
-        <label className="field">
-          <span>{copy.engine}</span>
-          <select
-            value={requirements.engineType}
-            onChange={(event) => updateText('engineType', event.target.value)}
-          >
-            <option value="electric">{copy.options.electric}</option>
-            <option value="hybrid">{copy.options.hybrid}</option>
-            <option value="turbine">{copy.options.turbine}</option>
-          </select>
-        </label>
-        <label className="field">
-          <span>{copy.material}</span>
-          <select
-            value={requirements.material}
-            onChange={(event) => updateText('material', event.target.value)}
-          >
-            <option value="carbon">{copy.options.carbon}</option>
-            <option value="aluminum">{copy.options.aluminum}</option>
-            <option value="titanium">{copy.options.titanium}</option>
-          </select>
-        </label>
-        <label className="field">
-          <span>{copy.energy}</span>
-          <select
-            value={requirements.energySource}
-            onChange={(event) => updateText('energySource', event.target.value)}
-          >
-            <option value="li-ion">{copy.options['li-ion']}</option>
-            <option value="fuel-cell">{copy.options['fuel-cell']}</option>
-            <option value="solar">{copy.options.solar}</option>
-          </select>
-        </label>
-        <label className="field">
-          <span>{copy.environment}</span>
-          <select
-            value={requirements.environment}
-            onChange={(event) => updateText('environment', event.target.value)}
-          >
-            <option value="cold">{copy.options.cold}</option>
-            <option value="desert">{copy.options.desert}</option>
-            <option value="urban">{copy.options.urban}</option>
-          </select>
-        </label>
+        {stage === 'design' && (
+          requirements.vehicleDomain === 'spacecraft' ? (
+            <>
+              <SelectField label={copy.scheme} value={requirements.vehicleScheme} onChange={(value) => updateText('vehicleScheme', value)}>
+                <option value="cubesat-satellite">{copy.options['cubesat-satellite']}</option>
+              </SelectField>
+              <SelectField label={copy.orbit} value={requirements.orbitClass} onChange={(value) => updateText('orbitClass', value)}>
+                <option value="leo">{copy.options.leo}</option>
+                <option value="sso">{copy.options.sso}</option>
+                <option value="geo">{copy.options.geo}</option>
+              </SelectField>
+              <SelectField label={copy.thermal} value={requirements.thermalControl} onChange={(value) => updateText('thermalControl', value)}>
+                <option value="passive">{copy.options.passive}</option>
+                <option value="active">{copy.options.active}</option>
+              </SelectField>
+            </>
+          ) : (
+            <SelectField label={copy.scheme} value={requirements.vehicleScheme} onChange={(value) => updateText('vehicleScheme', value)}>
+              <option value="fixed-wing">{copy.options['fixed-wing']}</option>
+              <option value="multirotor">{copy.options.multirotor}</option>
+              <option value="hybrid-vtol">{copy.options['hybrid-vtol']}</option>
+            </SelectField>
+          )
+        )}
+        {stage === 'manufacturing' && (
+          <>
+            <MaterialSelect copy={copy} value={requirements.material} onChange={(value) => updateText('material', value)} />
+            <SelectField label={copy.method} value={requirements.manufacturingMethod} onChange={(value) => updateText('manufacturingMethod', value)}>
+              <option value="cnc">{copy.options.cnc}</option>
+              <option value="autoclave">{copy.options.autoclave}</option>
+              <option value="vacuum-infusion">{copy.options['vacuum-infusion']}</option>
+              <option value="additive-polymer">{copy.options['additive-polymer']}</option>
+              <option value="dmls">{copy.options.dmls}</option>
+            </SelectField>
+            <SelectField label={copy.joint} value={requirements.jointMethod} onChange={(value) => updateText('jointMethod', value)}>
+              <option value="riveting">{copy.options.riveting}</option>
+              <option value="welding">{copy.options.welding}</option>
+              <option value="laser-welding">{copy.options['laser-welding']}</option>
+              <option value="tig-welding">{copy.options['tig-welding']}</option>
+              <option value="friction-welding">{copy.options['friction-welding']}</option>
+              <option value="adhesive">{copy.options.adhesive}</option>
+            </SelectField>
+            <SelectField label={copy.scale} value={requirements.productionScale} onChange={(value) => updateText('productionScale', value)}>
+              <option value="prototype">{copy.options.prototype}</option>
+              <option value="small-batch">{copy.options['small-batch']}</option>
+              <option value="serial">{copy.options.serial}</option>
+            </SelectField>
+          </>
+        )}
+        {stage === 'operations' && (
+          <>
+            <EnvironmentSelect
+              copy={copy}
+              domain={requirements.vehicleDomain}
+              value={requirements.environment}
+              onChange={(value) => updateText('environment', value)}
+            />
+            <SelectField label={copy.missionMode} value={requirements.missionMode} onChange={(value) => updateText('missionMode', value)}>
+              {requirements.vehicleDomain === 'spacecraft' ? (
+                <option value="orbital">{copy.options.orbital}</option>
+              ) : (
+                <>
+                  <option value="waypoint">{copy.options.waypoint}</option>
+                  <option value="fpv">{copy.options.fpv}</option>
+                </>
+              )}
+            </SelectField>
+            <SelectField label={copy.checkType} value={requirements.checkType} onChange={(value) => updateText('checkType', value)}>
+              <option value="regular">{copy.options.regular}</option>
+              <option value="hard-landing">{copy.options['hard-landing']}</option>
+              <option value="preflight">{copy.options.preflight}</option>
+            </SelectField>
+          </>
+        )}
       </div>
     </section>
+  );
+}
+
+function SelectField({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: ReactNode }) {
+  return (
+    <label className="field">
+      <span>{label}</span>
+      <select value={value} onChange={(event) => onChange(event.target.value)}>
+        {children}
+      </select>
+    </label>
+  );
+}
+
+function MaterialSelect({ copy, value, onChange }: { copy: MissionInputCopy; value: string; onChange: (value: string) => void }) {
+  return (
+    <SelectField label={copy.material} value={value} onChange={onChange}>
+      <option value="carbon">{copy.options.carbon}</option>
+      <option value="aluminum-2024">{copy.options['aluminum-2024']}</option>
+      <option value="aluminum-7075">{copy.options['aluminum-7075']}</option>
+      <option value="titanium">{copy.options.titanium}</option>
+      <option value="petg">{copy.options.petg}</option>
+      <option value="pa12">{copy.options.pa12}</option>
+      <option value="dmls-metal">{copy.options['dmls-metal']}</option>
+    </SelectField>
+  );
+}
+
+function EnvironmentSelect({
+  copy,
+  domain,
+  value,
+  onChange,
+}: {
+  copy: MissionInputCopy;
+  domain: MissionRequirements['vehicleDomain'];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <SelectField label={copy.environment} value={value} onChange={onChange}>
+      {domain === 'spacecraft' ? (
+        <>
+          <option value="space">{copy.options.space}</option>
+          <option value="cold">{copy.options.cold}</option>
+        </>
+      ) : (
+        <>
+          <option value="normal">{copy.options.normal}</option>
+          <option value="cold">{copy.options.cold}</option>
+          <option value="wind">{copy.options.wind}</option>
+        </>
+      )}
+    </SelectField>
   );
 }

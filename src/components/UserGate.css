@@ -1,0 +1,33 @@
+.user-gate {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 72vh;
+}
+
+.user-gate__card {
+  display: grid;
+  gap: 14px;
+  max-width: 460px;
+  width: min(100%, 460px);
+}
+
+.user-gate__card h1 {
+  font-size: 34px;
+}
+
+.user-gate__card p {
+  color: var(--soft);
+  line-height: 1.55;
+}
+
+.user-gate__card label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.user-gate__card label span {
+  color: var(--soft);
+  font-size: 13px;
+}

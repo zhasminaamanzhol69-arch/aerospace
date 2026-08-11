@@ -27,6 +27,65 @@
 .ai-report__params span { color: var(--soft); }
 .ai-report__params strong { color: var(--accent); text-align: center; }
 
+.ai-report__subtitle {
+  color: var(--soft);
+  margin-top: 6px;
+}
+
+.ai-report__input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-report__input span {
+  color: var(--soft);
+  font-size: 13px;
+}
+
+.ai-report__input textarea {
+  background: rgba(7, 17, 31, 0.74);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.5;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.ai-report__input textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--glow);
+  outline: none;
+}
+
+.ai-report__result {
+  background: rgba(7, 17, 31, 0.52);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.ai-report__flow {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.ai-report__flow span {
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 9px 10px;
+  text-align: center;
+}
+
 .ai-report__text, .ai-report__placeholder {
   color: var(--soft);
   line-height: 1.65;
@@ -37,4 +96,5 @@
   .ai-report__header { flex-direction: column; }
   .ai-report__params { grid-template-columns: 1fr; }
   .ai-report__params strong { text-align: left; }
+  .ai-report__flow { grid-template-columns: 1fr; }
 }

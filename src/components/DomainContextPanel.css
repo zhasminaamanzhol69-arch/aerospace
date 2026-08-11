@@ -1,0 +1,35 @@
+.domain-context {
+  align-items: center;
+  background: linear-gradient(135deg, rgba(8, 47, 73, 0.72), rgba(20, 83, 45, 0.42));
+  border: 1px solid rgba(34, 211, 238, 0.34);
+  border-radius: 8px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1.5fr 1fr;
+  padding: 18px;
+}
+
+.domain-context h2 {
+  font-size: 22px;
+  margin: 4px 0 8px;
+}
+
+.domain-context p {
+  color: var(--soft);
+  line-height: 1.55;
+}
+
+.domain-context strong {
+  background: rgba(15, 23, 42, 0.58);
+  border: 1px solid rgba(34, 211, 238, 0.24);
+  border-radius: 8px;
+  color: #67e8f9;
+  line-height: 1.45;
+  padding: 14px;
+}
+
+@media (max-width: 780px) {
+  .domain-context {
+    grid-template-columns: 1fr;
+  }
+}
