@@ -1,0 +1,49 @@
+.calculated-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.calculated-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.calculated-metric {
+  background: rgba(7, 17, 31, 0.5);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.calculated-metric span {
+  color: var(--soft);
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.calculated-metric strong {
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.advice-panel {
+  background: rgba(7, 17, 31, 0.46);
+  border: 1px solid rgba(30, 58, 82, 0.92);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.advice-panel h3 {
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.advice-panel p {
+  color: var(--soft);
+  line-height: 1.5;
+}

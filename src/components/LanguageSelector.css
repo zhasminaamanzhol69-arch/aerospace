@@ -1,0 +1,33 @@
+.language-selector {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.language-selector span {
+  color: var(--soft);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.language-selector div {
+  background: rgba(7, 17, 31, 0.58);
+  border: 1px solid rgba(30, 58, 82, 0.92);
+  border-radius: 8px;
+  display: flex;
+  padding: 4px;
+}
+
+.language-selector button {
+  background: transparent;
+  color: var(--soft);
+  font-size: 13px;
+  padding: 8px 10px;
+}
+
+.language-selector button.is-selected {
+  background: var(--accent);
+  color: var(--bg);
+}

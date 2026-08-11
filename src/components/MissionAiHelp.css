@@ -1,0 +1,29 @@
+.mission-help {
+  margin: 12px 0 18px;
+}
+
+.mission-help__button {
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  color: var(--accent);
+}
+
+.mission-help__panel {
+  background: rgba(7, 17, 31, 0.52);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 14px;
+}
+
+.mission-help__panel h3 {
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.mission-help__panel p {
+  color: var(--soft);
+  line-height: 1.5;
+}

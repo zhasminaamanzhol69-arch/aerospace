@@ -1,0 +1,46 @@
+.twin-panel { display: flex; flex-direction: column; gap: 18px; }
+
+.twin-diagram {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+}
+
+.twin-diagram button {
+  background: rgba(7, 17, 31, 0.42);
+  border: 1px solid rgba(30, 58, 82, 0.92);
+  color: var(--ink);
+  min-height: 54px;
+  overflow-wrap: anywhere;
+  padding: 12px;
+  text-align: center;
+}
+
+.twin-diagram button.is-selected {
+  border-color: rgba(56, 189, 248, 0.62);
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.1);
+  color: var(--accent-secondary);
+}
+
+.twin-explanation {
+  background: rgba(7, 17, 31, 0.5);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.twin-explanation h3 {
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.twin-explanation p {
+  color: var(--soft);
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.twin-explanation strong {
+  color: var(--ink);
+  line-height: 1.5;
+}

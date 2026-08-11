@@ -1,0 +1,29 @@
+.faq-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.faq-list {
+  display: grid;
+  gap: 10px;
+}
+
+.faq-item {
+  background: rgba(7, 17, 31, 0.5);
+  border: 1px solid rgba(30, 58, 82, 0.92);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.faq-item summary {
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.faq-item p {
+  color: var(--soft);
+  line-height: 1.6;
+  margin-top: 12px;
+}
