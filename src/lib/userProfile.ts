@@ -1,6 +1,10 @@
+import type { User } from '@supabase/supabase-js';
+
 export type UserProfile = {
   name: string;
   nickname: string;
+  email?: string;
+  provider?: 'local' | 'google';
 };
 
 const profileKey = 'aerospace-user-profile';
@@ -16,6 +20,8 @@ export function loadUserProfile() {
     return {
       name: parsed.name,
       nickname: parsed.nickname,
+      email: parsed.email,
+      provider: parsed.provider,
     };
   } catch {
     return null;
@@ -28,4 +34,22 @@ export function saveUserProfile(profile: UserProfile) {
 
 export function clearUserProfile() {
   localStorage.removeItem(profileKey);
+}
+
+export function buildAuthProfile(user: User): UserProfile {
+  const email = user.email ?? '';
+  const displayName = getStringMetadata(user, 'full_name') || getStringMetadata(user, 'name') || email.split('@')[0] || 'Google User';
+  const nickname = email.split('@')[0] || displayName.toLowerCase().replace(/\s+/g, '');
+
+  return {
+    name: displayName,
+    nickname,
+    email,
+    provider: user.app_metadata.provider === 'google' ? 'google' : 'local',
+  };
+}
+
+function getStringMetadata(user: User, key: string) {
+  const value = user.user_metadata[key];
+  return typeof value === 'string' ? value : '';
 }

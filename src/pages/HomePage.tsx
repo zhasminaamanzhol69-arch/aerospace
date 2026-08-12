@@ -1,14 +1,17 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { Link } from 'wouter';
 import { AgentWorkflow } from '../components/AgentWorkflow';
 import { AiEngineeringReport } from '../components/AiEngineeringReport';
 import { CalculatedParametersPanel } from '../components/CalculatedParametersPanel';
 import { DesignRecommendation } from '../components/DesignRecommendation';
 import { DigitalTwinPanel } from '../components/DigitalTwinPanel';
 import { DomainContextPanel } from '../components/DomainContextPanel';
+import { EngineeringCalculator } from '../components/EngineeringCalculator';
 import { FaqSection } from '../components/FaqSection';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { MissionInputForm } from '../components/MissionInputForm';
 import { ProfileMenu } from '../components/ProfileMenu';
+import { SiteMenu } from '../components/SiteMenu';
 import { StageTabs } from '../components/StageTabs';
 import { UserGate } from '../components/UserGate';
 import { VehicleDomainTabs } from '../components/VehicleDomainTabs';
@@ -26,6 +29,8 @@ import {
   saveUserProfile,
   type UserProfile,
 } from '../lib/userProfile';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { useGoogleAuthProfile } from '../lib/useGoogleAuthProfile';
 import aviationHeroImage from '../assets/aviation-domain-hero.png';
 import spacecraftHeroImage from '../assets/spacecraft-domain-hero.png';
 import './HomePage.css';
@@ -54,13 +59,16 @@ export function HomePage() {
   const options = useMemo(() => buildDesignOptions(requirements), [requirements]);
   const text = heroText[language];
   const isSpacecraft = requirements.vehicleDomain === 'spacecraft';
+  const applyProfile = useCallback((nextProfile: UserProfile) => setProfile(nextProfile), []);
+  useGoogleAuthProfile(applyProfile);
 
   function handleProfileComplete(nextProfile: UserProfile) {
     saveUserProfile(nextProfile);
     setProfile(nextProfile);
   }
 
-  function handleLogout() {
+  async function handleLogout() {
+    if (isSupabaseConfigured) await supabase.auth.signOut();
     clearUserProfile();
     setProfile(null);
   }
@@ -83,6 +91,7 @@ export function HomePage() {
     <LanguageContext.Provider value={{ language, setLanguage }}>
       <main className="container mission-page">
         <div className="top-bar">
+          {profile && <SiteMenu />}
           <LanguageSelector />
           {profile && <ProfileMenu profile={profile} onLogout={handleLogout} />}
         </div>
@@ -112,6 +121,13 @@ export function HomePage() {
           <MissionInputForm stage={stage} requirements={requirements} onChange={setRequirements} />
           <CalculatedParametersPanel stage={stage} parameters={parameters} requirements={requirements} />
         </section>
+
+        <EngineeringCalculator requirements={requirements} parameters={parameters} />
+
+        <Link className="document-entry" href="/documents">
+          <span>PDF / DOCX → анализ документа</span>
+          <strong>Загрузить ТУ, ГОСТ, ОСТ, руководство или редакцию документа</strong>
+        </Link>
 
         {stage === 'operations' ? (
           <section className="mission-grid">
