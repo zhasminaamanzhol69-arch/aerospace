@@ -13,6 +13,7 @@ import { LanguageSelector } from '../components/LanguageSelector';
 import { MissionInputForm } from '../components/MissionInputForm';
 import { ProfileMenu } from '../components/ProfileMenu';
 import { SiteMenu } from '../components/SiteMenu';
+import { StageEngineeringSuite } from '../components/StageEngineeringSuite';
 import { StageTabs } from '../components/StageTabs';
 import { UserGate } from '../components/UserGate';
 import { VehicleDomainTabs } from '../components/VehicleDomainTabs';
@@ -120,6 +121,8 @@ export function HomePage() {
         </section>
 
         <EngineeringCalculator requirements={requirements} parameters={parameters} />
+
+        <StageEngineeringSuite stage={stage} requirements={requirements} parameters={parameters} options={options} />
 
         {stage === 'operations' ? (
           <section className="mission-grid" id="ai-agent">

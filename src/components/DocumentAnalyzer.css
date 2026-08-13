@@ -68,6 +68,36 @@
   white-space: pre-wrap;
 }
 
+.document-sources,
+.document-diff {
+  background: rgba(7, 17, 31, 0.52);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+}
+
+.document-sources strong,
+.document-diff strong {
+  color: var(--accent);
+}
+
+.document-sources span,
+.document-diff span {
+  color: var(--soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.document-diff .added {
+  color: var(--green);
+}
+
+.document-diff .removed {
+  color: var(--amber);
+}
+
 @media (max-width: 760px) {
   .document-upload-grid,
   .quick-question-grid {

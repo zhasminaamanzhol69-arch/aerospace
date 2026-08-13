@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { answerDocumentQuestion } from '../lib/documentAi';
 import { documentAnalyzerText } from '../lib/documentAnalyzerText';
 import { extractDocumentText, type ExtractedDocument } from '../lib/documentExtraction';
+import { buildRevisionDiff, buildSourceAttribution } from '../lib/documentInsights';
 import { useLanguage } from '../lib/language';
 import './DocumentAnalyzer.css';
 
@@ -12,6 +13,8 @@ export function DocumentAnalyzer() {
   const [previous, setPrevious] = useState<ExtractedDocument | null>(null);
   const [question, setQuestion] = useState(copy.quick[0]);
   const [answer, setAnswer] = useState('');
+  const [sources, setSources] = useState<string[]>([]);
+  const [diff, setDiff] = useState<ReturnType<typeof buildRevisionDiff>>([]);
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,6 +45,8 @@ export function DocumentAnalyzer() {
     setIsLoading(true);
     setStatus(copy.analyzing);
     setAnswer('');
+    setSources(buildSourceAttribution(current, question));
+    setDiff(buildRevisionDiff(current, previous));
 
     const nextAnswer = await answerDocumentQuestion(current, question.trim(), previous);
     setAnswer(nextAnswer);
@@ -80,6 +85,18 @@ export function DocumentAnalyzer() {
       </button>
 
       {status && <p className="document-status">{status}</p>}
+      {sources.length > 0 && (
+        <div className="document-sources">
+          <strong>Source Attribution</strong>
+          {sources.map((source) => <span key={source}>{source}</span>)}
+        </div>
+      )}
+      {diff.length > 0 && (
+        <div className="document-diff">
+          <strong>Revision Diff</strong>
+          {diff.map((item) => <span className={item.type} key={`${item.type}-${item.line}`}>{item.type === 'added' ? '+ ' : '- '}{item.line}</span>)}
+        </div>
+      )}
       {answer && <pre className="document-answer">{answer}</pre>}
     </section>
   );
