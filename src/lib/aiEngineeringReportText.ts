@@ -23,7 +23,7 @@ export const aiReportText: Record<Language, {
     inputLabel: 'Инженерлік сұрақ',
     inputPlaceholder: 'Мысалы: осы миссия үшін қандай материал және тексеріс тәртібі керек?',
     emptyQuestion: 'Алдымен AI-ға сұрақ жазыңыз.',
-    placeholder: 'AI жауапты үш блокпен береді: [ЖОБАЛАУ], [ДАЙЫНДАУ], [ПАЙДАЛАНУ].',
+    placeholder: 'AI таңдалған кезең бойынша қысқа инженерлік жауап береді.',
     risk: { Low: 'Төмен', Medium: 'Орташа', High: 'Жоғары' },
   },
   ru: {
@@ -36,7 +36,7 @@ export const aiReportText: Record<Language, {
     inputLabel: 'Инженерный запрос',
     inputPlaceholder: 'Например: какой материал и порядок проверки нужны для этой миссии?',
     emptyQuestion: 'Сначала напиши вопрос для AI.',
-    placeholder: 'AI ответит в формате: [ЭТАП: ПРОЕКТИРОВАНИЕ], [ЭТАП: ПРОИЗВОДСТВО], [ЭТАП: ЭКСПЛУАТАЦИЯ].',
+    placeholder: 'AI ответит по выбранному этапу: краткий вывод, рекомендация, параметры, стандарты и риски.',
     risk: { Low: 'Low', Medium: 'Medium', High: 'High' },
   },
   en: {
@@ -49,7 +49,7 @@ export const aiReportText: Record<Language, {
     inputLabel: 'Engineering request',
     inputPlaceholder: 'Example: which material and verification flow fit this mission?',
     emptyQuestion: 'Write a question for AI first.',
-    placeholder: 'AI will answer with Design, Manufacturing, and Operations engineering sections.',
+    placeholder: 'AI will answer for the selected phase with recommendation, parameters, standards, and risks.',
     risk: { Low: 'Low', Medium: 'Medium', High: 'High' },
   },
 };

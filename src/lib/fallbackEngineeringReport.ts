@@ -35,19 +35,24 @@ function buildRussianReport(
 
   return commonReport({
     active: stageName.ru[stage],
-    designDecision,
-    manufacturingDecision: `Рекомендуемый маршрут: ${materialName(req.material)}, процесс ${processName(req.manufacturingMethod)}, соединение ${req.jointMethod}.`,
-    operationsDecision: req.vehicleDomain === 'spacecraft'
+    decision: selectByStage(stage, {
+      design: designDecision,
+      manufacturing: `Рекомендуемый маршрут: ${materialName(req.material)}, процесс ${processName(req.manufacturingMethod)}, соединение ${req.jointMethod}.`,
+      operations: req.vehicleDomain === 'spacecraft'
       ? `Эксплуатация: контролировать энергобаланс, связь ${params.linkQualityPercent}% и терморежим ${req.thermalControl}.`
       : `Эксплуатация: контролировать SoH ${req.batterySohPercent}%, RSSI ${req.linkRssiDbm} dBm и резерв RTH ${params.emergencyReservePercent}%.`,
-    standardsDesign: req.vehicleDomain === 'spacecraft'
+    }),
+    standards: selectByStage(stage, {
+      design: req.vehicleDomain === 'spacecraft'
       ? 'NASA-STD-5001 и ECSS-E-ST применимы как база для прочности, нагрузок и верификации космических конструкций.'
       : 'FAA Part 107/ИКАО применимы для эксплуатации БПЛА; для прочности использовать NASA-STD-5001 как справочную инженерную базу.',
-    standardsManufacturing: 'ECSS-Q-ST-70C, ISO 9001/AS9100, ГОСТ 18353, ISO 2768-m использовать как базу производства и контроля.',
-    standardsOperations: req.vehicleDomain === 'spacecraft'
+      manufacturing: 'ECSS-Q-ST-70C, ISO 9001/AS9100, ГОСТ 18353, ISO 2768-m использовать как базу производства и контроля.',
+      operations: req.vehicleDomain === 'spacecraft'
       ? 'ECSS-E-ST-10-03C использовать для испытаний; FAA Part 107 не является основным нормативом для спутников.'
       : 'FAA Part 107, ИКАО и ГОСТ В 20.39.304 использовать для эксплуатационных ограничений и проверок.',
+    }),
     params: `Мощность ${params.requiredPowerW} W, энергия ${params.requiredEnergyWh} Wh, MOS ${params.marginOfSafety}, риск ${params.riskLevel}.`,
+    risks: 'Проверить, что выбранный класс аппарата, среда и режим миссии совпадают; не переносить правила БПЛА на спутники и наоборот.',
     language: 'ru',
   });
 }
@@ -59,13 +64,18 @@ function buildKazakhReport(req: MissionRequirements, params: CalculatedParameter
 
   return commonReport({
     active: stageName.kk[stage],
-    designDecision,
-    manufacturingDecision: `Өндірістік маршрут: ${materialName(req.material)}, процесс ${processName(req.manufacturingMethod)}, қосылыс ${req.jointMethod}.`,
-    operationsDecision: `Пайдалану: байланыс ${params.linkQualityPercent}%, ресурс ${params.serviceLifeHours} h және anomaly ${params.anomalyStatus} бақылау.`,
-    standardsDesign: 'NASA-STD-5001 және ECSS-E/ST нақты пунктсіз тек жалпы инженерлік негіз ретінде көрсетіледі.',
-    standardsManufacturing: 'ECSS-Q-ST-70C, ISO 9001/AS9100, ГОСТ 18353 және ISO 2768-m өндіріс пен бақылауға қатысты.',
-    standardsOperations: 'ECSS-E-ST-10-03C, FAA Part 107/ICAO немесе ГОСТ нормалары аппарат класына қарай қолданылады.',
+    decision: selectByStage(stage, {
+      design: designDecision,
+      manufacturing: `Өндірістік маршрут: ${materialName(req.material)}, процесс ${processName(req.manufacturingMethod)}, қосылыс ${req.jointMethod}.`,
+      operations: `Пайдалану: байланыс ${params.linkQualityPercent}%, ресурс ${params.serviceLifeHours} h және anomaly ${params.anomalyStatus} бақылау.`,
+    }),
+    standards: selectByStage(stage, {
+      design: 'NASA-STD-5001 және ECSS-E/ST нақты пунктсіз тек жалпы инженерлік негіз ретінде көрсетіледі.',
+      manufacturing: 'ECSS-Q-ST-70C, ISO 9001/AS9100, ГОСТ 18353 және ISO 2768-m өндіріс пен бақылауға қатысты.',
+      operations: 'ECSS-E-ST-10-03C, FAA Part 107/ICAO немесе ГОСТ нормалары аппарат класына қарай қолданылады.',
+    }),
     params: `Қуат ${params.requiredPowerW} W, энергия ${params.requiredEnergyWh} Wh, MOS ${params.marginOfSafety}, тәуекел ${params.riskLevel}.`,
+    risks: 'Аппарат класы, орта және миссия режимі сәйкес екенін тексеру керек.',
     language: 'kk',
   });
 }
@@ -77,45 +87,46 @@ function buildEnglishReport(req: MissionRequirements, params: CalculatedParamete
 
   return commonReport({
     active: stageName.en[stage],
-    designDecision,
-    manufacturingDecision: `Manufacturing route: ${materialName(req.material)}, ${processName(req.manufacturingMethod)}, joint ${req.jointMethod}.`,
-    operationsDecision: `Operations: monitor link ${params.linkQualityPercent}%, service life ${params.serviceLifeHours} h, anomaly ${params.anomalyStatus}.`,
-    standardsDesign: 'NASA-STD-5001 and ECSS-E/ST are relevant as general design and verification references unless exact clauses are available.',
-    standardsManufacturing: 'ECSS-Q-ST-70C, ISO 9001/AS9100, GOST 18353, and ISO 2768-m are relevant for process and inspection.',
-    standardsOperations: 'ECSS-E-ST-10-03C, FAA Part 107/ICAO, or GOST references apply depending on vehicle domain.',
+    decision: selectByStage(stage, {
+      design: designDecision,
+      manufacturing: `Manufacturing route: ${materialName(req.material)}, ${processName(req.manufacturingMethod)}, joint ${req.jointMethod}.`,
+      operations: `Operations: monitor link ${params.linkQualityPercent}%, service life ${params.serviceLifeHours} h, anomaly ${params.anomalyStatus}.`,
+    }),
+    standards: selectByStage(stage, {
+      design: 'NASA-STD-5001 and ECSS-E/ST are relevant as general design and verification references unless exact clauses are available.',
+      manufacturing: 'ECSS-Q-ST-70C, ISO 9001/AS9100, GOST 18353, and ISO 2768-m are relevant for process and inspection.',
+      operations: 'ECSS-E-ST-10-03C, FAA Part 107/ICAO, or GOST references apply depending on vehicle domain.',
+    }),
     params: `Power ${params.requiredPowerW} W, energy ${params.requiredEnergyWh} Wh, MOS ${params.marginOfSafety}, risk ${params.riskLevel}.`,
+    risks: 'Verify that vehicle domain, environment, and mission mode match before applying standards.',
     language: 'en',
   });
 }
 
 function commonReport(data: {
   active: string;
-  designDecision: string;
-  manufacturingDecision: string;
-  operationsDecision: string;
-  standardsDesign: string;
-  standardsManufacturing: string;
-  standardsOperations: string;
+  decision: string;
+  standards: string;
   params: string;
+  risks: string;
   language: Language;
 }) {
   const unknown = data.language === 'ru' ? 'В имеющихся нормативных документах нет точной информации по пунктам/таблицам данного запроса.' : 'Exact clauses/tables are not available in the current context.';
-  return `[ЭТАП: ${data.active}]
+  return `Этап: ${data.active}
 
-[ЭТАП: ПРОЕКТИРОВАНИЕ]
-- Решение: ${data.designDecision}
-- Нормативное обоснование: ${data.standardsDesign} ${unknown}
-- Технические параметры: ${data.params}
+Краткий вывод: ${data.decision}
 
-[ЭТАП: ПРОИЗВОДСТВО]
-- Решение: ${data.manufacturingDecision}
-- Нормативное обоснование: ${data.standardsManufacturing} ${unknown}
-- Контроль качества: NDT ${data.params.includes('risk High') ? 'рентгенография/ультразвук' : 'ультразвук или визуально-измерительный контроль'}.
+Рекомендация: использовать выбранные параметры как предварительную инженерную оценку и уточнить их по паспорту материала, модели аппарата и требованиям миссии.
 
-[ЭТАП: ЭКСПЛУАТАЦИЯ]
-- Решение: ${data.operationsDecision}
-- Нормативное обоснование: ${data.standardsOperations} ${unknown}
-- Риски: проверить, что выбранный класс аппарата, среда и режим миссии совпадают; не переносить правила БПЛА на спутники и наоборот.`;
+Расчётные параметры: ${data.params}
+
+Стандарты: ${data.standards} ${unknown}
+
+Риски: ${data.risks}`;
+}
+
+function selectByStage(stage: EngineeringStage, values: Record<EngineeringStage, string>) {
+  return values[stage];
 }
 
 function materialName(material: string) {

@@ -65,7 +65,7 @@ function buildOptionsBlock(options: DesignOption[]) {
 
 function buildGuardrails(stage: EngineeringStage, domain: MissionRequirements['vehicleDomain']) {
   return `Дополнительные правила:
-- Подробно раскрывай выбранный этап ${engineeringStageLabel[stage]}, два других этапа оставляй короткими.
+- Раскрывай только выбранный этап ${engineeringStageLabel[stage]}; другие этапы не добавляй, если пользователь прямо не попросил сравнение.
 - Не придумывай нормативные ссылки, коэффициенты, допустимые напряжения, допуски и параметры испытаний.
 - Для Manufacturing используй ECSS-Q-ST-70C, ISO 9001/AS9100, ГОСТ 18353, ISO 2768-m, ISO 5817, ГОСТ 14771 только когда они релевантны.
 - Для Operations используй ECSS-E-ST-10-03C, FAA Part 107, ИКАО, ГОСТ В 20.39.304, ГОСТ 23743 только когда они релевантны.
