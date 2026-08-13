@@ -32,6 +32,27 @@
   font-size: 13px;
 }
 
+.user-gate__mode {
+  background: rgba(7, 17, 31, 0.58);
+  border: 1px solid rgba(30, 58, 82, 0.9);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 1fr 1fr;
+  padding: 6px;
+}
+
+.user-gate__mode button {
+  background: transparent;
+  color: var(--soft);
+  padding: 10px;
+}
+
+.user-gate__mode button.is-active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
 .user-gate__google {
   align-items: center;
   background: rgba(248, 250, 252, 0.96);
@@ -68,14 +89,8 @@
   height: 1px;
 }
 
-.user-gate__actions {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: 1fr auto;
-}
-
 @media (max-width: 560px) {
-  .user-gate__actions {
+  .user-gate__mode {
     grid-template-columns: 1fr;
   }
 }

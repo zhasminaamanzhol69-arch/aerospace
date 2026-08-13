@@ -128,7 +128,7 @@
 }
 
 .intro-splash.is-started .intro-splash__content {
-  animation: titleHold 6500ms ease-in-out both;
+  animation: titleHold 6500ms ease-in-out both, titleBeat 1450ms ease-out both 3750ms;
 }
 
 .intro-splash.is-started .intro-splash__streak {
@@ -137,6 +137,14 @@
 
 .intro-splash.is-started .intro-splash__rocket {
   animation: rocketFly 2300ms cubic-bezier(0.1, 0.78, 0.16, 1) both 1650ms;
+}
+
+.intro-splash.is-started .intro-splash__planet {
+  animation: planetIn 6500ms ease-in-out both, planetBeat 1450ms ease-out both 3750ms;
+}
+
+.intro-splash.is-started .intro-splash__planet::before {
+  animation: ringBeat 1450ms ease-out both 3750ms;
 }
 
 .intro-splash:not(.is-started) .intro-splash__planet {
@@ -207,6 +215,21 @@
   44% { opacity: 1; transform: translate(-50%, -50%) scale(0.82) rotate(18deg); }
   76% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(46deg); }
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1.12) rotate(68deg); }
+}
+
+@keyframes titleBeat {
+  0%, 18%, 36%, 61%, 100% { filter: drop-shadow(0 0 0 rgba(103, 232, 249, 0)); transform: scale(1); }
+  6%, 24%, 44%, 72% { filter: drop-shadow(0 0 18px rgba(103, 232, 249, 0.62)); transform: scale(1.018); }
+}
+
+@keyframes planetBeat {
+  0%, 18%, 36%, 61%, 100% { box-shadow: 0 0 70px rgba(59, 130, 246, 0.34), inset -18px -16px 32px rgba(7, 17, 31, 0.72); }
+  6%, 24%, 44%, 72% { box-shadow: 0 0 104px rgba(103, 232, 249, 0.58), inset -18px -16px 32px rgba(7, 17, 31, 0.72); }
+}
+
+@keyframes ringBeat {
+  0%, 18%, 36%, 61%, 100% { opacity: 0.62; transform: rotate(-18deg) scaleY(0.34) scale(1); }
+  6%, 24%, 44%, 72% { opacity: 1; transform: rotate(-18deg) scaleY(0.34) scale(1.08); }
 }
 
 @keyframes orbitSpin {

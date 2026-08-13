@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Link } from 'wouter';
 import { AgentWorkflow } from '../components/AgentWorkflow';
 import { AiEngineeringReport } from '../components/AiEngineeringReport';
 import { CalculatedParametersPanel } from '../components/CalculatedParametersPanel';
@@ -8,6 +7,7 @@ import { DigitalTwinPanel } from '../components/DigitalTwinPanel';
 import { DomainContextPanel } from '../components/DomainContextPanel';
 import { EngineeringCalculator } from '../components/EngineeringCalculator';
 import { FaqSection } from '../components/FaqSection';
+import { HomeQuickActions } from '../components/HomeQuickActions';
 import { IntroSplash } from '../components/IntroSplash';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { MissionInputForm } from '../components/MissionInputForm';
@@ -30,26 +30,12 @@ import {
   saveUserProfile,
   type UserProfile,
 } from '../lib/userProfile';
+import { heroText } from '../lib/homeText';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { useGoogleAuthProfile } from '../lib/useGoogleAuthProfile';
 import aviationHeroImage from '../assets/aviation-domain-hero.png';
 import spacecraftHeroImage from '../assets/spacecraft-domain-hero.png';
 import './HomePage.css';
-
-const heroText = {
-  kk: {
-    title: 'AI System for Aerospace Design, Manufacturing & Operational Engineering Decisions',
-    body: 'Инженерлік ассистент: ұшу және ғарыш аппараттарын жобалау, дайындау мен пайдалану кезеңдеріндегі нормативтік және техникалық шешімдер.',
-  },
-  ru: {
-    title: 'AI System for Aerospace Design, Manufacturing & Operational Engineering Decisions',
-    body: 'Инженерный ассистент: нормативные и технические решения на этапах проектирования, производства и эксплуатации летательных и космических аппаратов.',
-  },
-  en: {
-    title: 'AI System for Aerospace Design, Manufacturing & Operational Engineering Decisions',
-    body: 'Engineering assistant for standards-based and technical decisions across design, manufacturing, and operations of aircraft and spacecraft.',
-  },
-};
 
 export function HomePage() {
   const { language } = useLanguage();
@@ -62,12 +48,16 @@ export function HomePage() {
   const options = useMemo(() => buildDesignOptions(requirements), [requirements]);
   const text = heroText[language];
   const isSpacecraft = requirements.vehicleDomain === 'spacecraft';
-  const applyProfile = useCallback((nextProfile: UserProfile) => setProfile(nextProfile), []);
+  const applyProfile = useCallback((nextProfile: UserProfile) => {
+    setProfile(nextProfile);
+    setShowIntro(false);
+  }, []);
   useGoogleAuthProfile(applyProfile);
 
   function handleProfileComplete(nextProfile: UserProfile) {
     saveUserProfile(nextProfile);
     setProfile(nextProfile);
+    setShowIntro(false);
   }
 
   async function handleLogout() {
@@ -120,6 +110,8 @@ export function HomePage() {
           </div>
         </section>
 
+        <HomeQuickActions />
+
         <AgentWorkflow stage={stage} domain={requirements.vehicleDomain} />
 
         <section className="mission-grid">
@@ -129,18 +121,13 @@ export function HomePage() {
 
         <EngineeringCalculator requirements={requirements} parameters={parameters} />
 
-        <Link className="document-entry" href="/documents">
-          <span>PDF / DOCX → анализ документа</span>
-          <strong>Загрузить ТУ, ГОСТ, ОСТ, руководство или редакцию документа</strong>
-        </Link>
-
         {stage === 'operations' ? (
-          <section className="mission-grid">
+          <section className="mission-grid" id="ai-agent">
             <DigitalTwinPanel parameters={parameters} requirements={requirements} />
             <AiEngineeringReport stage={stage} requirements={requirements} parameters={parameters} options={options} />
           </section>
         ) : (
-          <section className="mission-grid">
+          <section className="mission-grid" id="ai-agent">
             <DesignRecommendation stage={stage} options={options} requirements={requirements} />
             <AiEngineeringReport stage={stage} requirements={requirements} parameters={parameters} options={options} />
           </section>

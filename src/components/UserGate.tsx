@@ -1,85 +1,55 @@
 import { useState } from 'react';
-import type { UserProfile } from '../lib/userProfile';
+import { useLanguage } from '../lib/language';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { useLanguage, type Language } from '../lib/language';
+import { buildLocalProfile, signInWithEmail, signUpWithEmail, type UserGateForm } from '../lib/userGateAuth';
+import { userGateText, type AuthMode } from '../lib/userGateText';
+import type { UserProfile } from '../lib/userProfile';
 import './UserGate.css';
 
-type Props = {
-  onComplete: (profile: UserProfile) => void;
-};
+type Props = { onComplete: (profile: UserProfile) => void };
 
-const text: Record<Language, {
-  title: string;
-  subtitle: string;
-  name: string;
-  nickname: string;
-  password: string;
-  button: string;
-  login: string;
-  google: string;
-  error: string;
-  googleError: string;
-  googleDisabled: string;
-}> = {
-  kk: {
-    title: 'Жеке инженерлік профиль',
-    subtitle: 'Қолдануды бастау үшін аты-жөніңізді және никіңізді енгізіңіз.',
-    name: 'Аты-жөні',
-    nickname: 'Ник',
-    password: 'Құпиясөз',
-    button: 'Тіркелу',
-    login: 'Кіру',
-    google: 'Google арқылы кіру',
-    error: 'Аты-жөніңізді, ник және кемінде 6 таңбалы құпиясөз енгізіңіз.',
-    googleError: 'Supabase бапталмаған немесе Google Provider қосылмаған.',
-    googleDisabled: 'Supabase ішінде Google Provider қосылмаған.',
-  },
-  ru: {
-    title: 'Мини-регистрация',
-    subtitle: 'Чтобы пользоваться агентом, введите имя и придумайте ник.',
-    name: 'Имя',
-    nickname: 'Ник',
-    password: 'Пароль',
-    button: 'Зарегистрироваться',
-    login: 'Войти',
-    google: 'Войти через Google',
-    error: 'Заполните имя, ник и пароль минимум 6 символов.',
-    googleError: 'Supabase не настроен или Google Provider ещё не включён.',
-    googleDisabled: 'В Supabase ещё не включён Google Provider.',
-  },
-  en: {
-    title: 'Mini registration',
-    subtitle: 'Enter your name and choose a nickname to use the agent.',
-    name: 'Name',
-    nickname: 'Nickname',
-    password: 'Password',
-    button: 'Sign up',
-    login: 'Log in',
-    google: 'Continue with Google',
-    error: 'Fill in name, nickname, and a password of at least 6 characters.',
-    googleError: 'Supabase is not configured or Google Provider is not enabled yet.',
-    googleDisabled: 'Google Provider is not enabled in Supabase yet.',
-  },
-};
+const initialForm: UserGateForm = { name: '', surname: '', nickname: '', email: '', phone: '', password: '' };
 
 export function UserGate({ onComplete }: Props) {
   const { language } = useLanguage();
-  const [name, setName] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
+  const [mode, setMode] = useState<AuthMode>('login');
+  const [form, setForm] = useState<UserGateForm>(initialForm);
   const [error, setError] = useState('');
-  const copy = text[language];
+  const copy = userGateText[language];
 
-  function handleSubmit() {
-    const nextName = name.trim();
-    const nextNickname = nickname.trim();
+  function update(field: keyof UserGateForm, value: string) {
+    setForm((current) => ({ ...current, [field]: value }));
+  }
 
-    if (!nextName || !nextNickname || password.length < 6) {
-      setError(copy.error);
+  async function handleEmailAuth() {
+    setError('');
+    if (mode === 'signup') {
+      await handleSignup();
       return;
     }
+    await handleLogin();
+  }
 
-    onComplete({ name: nextName, nickname: nextNickname, provider: 'local' });
+  async function handleSignup() {
+    const profile = buildLocalProfile(form);
+    if (!profile.name || !profile.surname || !profile.nickname || !profile.email || form.password.length < 6) {
+      setError(copy.signupError);
+      return;
+    }
+    const result = await signUpWithEmail(form);
+    if (result.error) setError(result.error);
+    else onComplete(result.profile);
+  }
+
+  async function handleLogin() {
+    const email = form.email.trim();
+    if (!email || form.password.length < 6) {
+      setError(copy.loginError);
+      return;
+    }
+    const result = await signInWithEmail(email, form.password);
+    if (result.error || !result.profile) setError(copy.notRegistered);
+    else onComplete(result.profile);
   }
 
   async function handleGoogleLogin() {
@@ -87,47 +57,63 @@ export function UserGate({ onComplete }: Props) {
       setError(copy.googleError);
       return;
     }
-
     const { error: authError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin },
     });
+    if (authError) setError(authError.message.toLowerCase().includes('unsupported provider') ? copy.googleDisabled : authError.message);
+  }
 
-    if (authError) {
-      const isProviderDisabled = authError.message.toLowerCase().includes('unsupported provider');
-      setError(isProviderDisabled ? copy.googleDisabled : authError.message);
-    }
+  function handleGuestLogin() {
+    onComplete({
+      name: language === 'kk' ? 'Қонақ' : language === 'en' ? 'Guest' : 'Гость',
+      nickname: 'guest',
+      provider: 'local',
+    });
   }
 
   return (
     <section className="user-gate">
       <div className="card user-gate__card">
         <p className="eyebrow">Aerospace Access</p>
-        <h1>{copy.title}</h1>
-        <p>{copy.subtitle}</p>
-        <label>
-          <span>{copy.name}</span>
-          <input value={name} onChange={(event) => setName(event.target.value)} type="text" />
-        </label>
-        <label>
-          <span>{copy.nickname}</span>
-          <input value={nickname} onChange={(event) => setNickname(event.target.value)} type="text" />
-        </label>
-        <label>
-          <span>{copy.password}</span>
-          <input value={password} onChange={(event) => setPassword(event.target.value)} minLength={6} type="password" />
-        </label>
+        <h1>{copy.title[mode]}</h1>
+        <p>{copy.subtitle[mode]}</p>
+        <div className="user-gate__mode">
+          <button className={mode === 'login' ? 'is-active' : ''} type="button" onClick={() => setMode('login')}>{copy.login}</button>
+          <button className={mode === 'signup' ? 'is-active' : ''} type="button" onClick={() => setMode('signup')}>{copy.signup}</button>
+        </div>
+        {mode === 'signup' && <SignupFields copy={copy} form={form} update={update} />}
+        <Input label={copy.email} value={form.email} onChange={(value) => update('email', value)} type="email" />
+        <Input label={copy.password} value={form.password} onChange={(value) => update('password', value)} type="password" />
         {error && <p className="message">{error}</p>}
         <button className="user-gate__google" type="button" onClick={handleGoogleLogin}>
           <span aria-hidden="true">G</span>
           {copy.google}
         </button>
-        <div className="user-gate__divider"><span>или</span></div>
-        <div className="user-gate__actions">
-          <button type="button" onClick={handleSubmit}>{copy.button}</button>
-          <button className="ghost" type="button" onClick={handleSubmit}>{copy.login}</button>
-        </div>
+        <div className="user-gate__divider"><span>{copy.divider}</span></div>
+        <button type="button" onClick={handleEmailAuth}>{mode === 'signup' ? copy.signup : copy.login}</button>
+        <button className="ghost" type="button" onClick={handleGuestLogin}>{copy.guest}</button>
       </div>
     </section>
+  );
+}
+
+function SignupFields({ copy, form, update }: { copy: typeof userGateText.ru; form: UserGateForm; update: (field: keyof UserGateForm, value: string) => void }) {
+  return (
+    <>
+      <Input label={copy.name} value={form.name} onChange={(value) => update('name', value)} />
+      <Input label={copy.surname} value={form.surname} onChange={(value) => update('surname', value)} />
+      <Input label={copy.nickname} value={form.nickname} onChange={(value) => update('nickname', value)} />
+      <Input label={copy.phone} value={form.phone} onChange={(value) => update('phone', value)} type="tel" />
+    </>
+  );
+}
+
+function Input({ label, value, onChange, type = 'text' }: { label: string; value: string; onChange: (value: string) => void; type?: string }) {
+  return (
+    <label>
+      <span>{label}</span>
+      <input value={value} onChange={(event) => onChange(event.target.value)} minLength={type === 'password' ? 6 : undefined} type={type} />
+    </label>
   );
 }

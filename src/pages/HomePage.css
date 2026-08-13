@@ -114,6 +114,24 @@
 .field { display: flex; flex-direction: column; gap: 7px; }
 .field span, .metric span { color: var(--soft); font-size: 13px; }
 
+.mission-card .field input[type='number'] {
+  color: #2563eb;
+  font-weight: 800;
+}
+
+.mission-card .field input[type='number']::placeholder {
+  color: rgba(37, 99, 235, 0.58);
+}
+
+.mission-card .field input[type='number']:focus {
+  color: #1d4ed8;
+}
+
+.mission-card .field select {
+  background: rgba(7, 17, 31, 0.74);
+  color: var(--ink);
+}
+
 .recommendation-summary { color: var(--soft); line-height: 1.5; margin-bottom: 18px; }
 .metric-row { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 16px; }
 
