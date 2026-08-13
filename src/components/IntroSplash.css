@@ -1,0 +1,219 @@
+.intro-splash {
+  align-items: center;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(56, 189, 248, 0.16), transparent 21rem),
+    linear-gradient(135deg, rgba(7, 17, 31, 0.96), rgba(13, 27, 42, 0.98));
+  display: grid;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 28px;
+  place-items: center;
+  position: relative;
+}
+
+.intro-splash:not(.is-started) {
+  cursor: pointer;
+}
+
+.intro-splash__content {
+  animation: titleIn 1100ms ease-out both 180ms;
+  display: grid;
+  gap: 10px;
+  position: relative;
+  text-align: center;
+  z-index: 2;
+}
+
+.intro-splash__content h1 {
+  color: var(--ink);
+  font-size: clamp(72px, 16vw, 180px);
+  letter-spacing: 0;
+  line-height: 0.9;
+  text-shadow: 0 0 42px rgba(56, 189, 248, 0.32);
+}
+
+.intro-splash__content p {
+  color: var(--accent-secondary);
+  font-size: clamp(12px, 2vw, 15px);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.intro-splash__content span {
+  color: var(--soft);
+  font-size: clamp(14px, 2vw, 18px);
+}
+
+.intro-splash__content small {
+  animation: hintPulse 1600ms ease-in-out infinite;
+  color: rgba(226, 232, 240, 0.72);
+  font-size: 13px;
+  margin-top: 20px;
+  text-transform: uppercase;
+}
+
+.intro-splash__sky,
+.intro-splash__streak,
+.intro-splash__rocket,
+.intro-splash__planet {
+  inset: 0;
+  position: absolute;
+}
+
+.intro-splash__planet {
+  animation: planetIn 6500ms ease-in-out both;
+  aspect-ratio: 1;
+  background:
+    radial-gradient(circle at 36% 28%, rgba(255, 255, 255, 0.72), transparent 0.34rem),
+    radial-gradient(circle at 34% 34%, #67e8f9, #2563eb 54%, #0f172a 72%);
+  border: 1px solid rgba(147, 197, 253, 0.34);
+  border-radius: 50%;
+  box-shadow: 0 0 70px rgba(59, 130, 246, 0.34), inset -18px -16px 32px rgba(7, 17, 31, 0.72);
+  height: clamp(120px, 24vw, 240px);
+  left: 50%;
+  top: 58%;
+  transform: translate(-50%, -50%) scale(0.62);
+}
+
+.intro-splash__planet::before,
+.intro-splash__planet::after {
+  border: 1px solid rgba(103, 232, 249, 0.38);
+  border-radius: 50%;
+  content: '';
+  inset: -22%;
+  position: absolute;
+  transform: rotate(-18deg) scaleY(0.34);
+}
+
+.intro-splash__planet::after {
+  animation: orbitSpin 1700ms linear infinite;
+  border-color: rgba(251, 191, 36, 0.52);
+  inset: -38%;
+}
+
+.intro-splash__moon {
+  animation: moonBeat 820ms ease-in-out infinite;
+  background: #f8fafc;
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgba(248, 250, 252, 0.72);
+  height: 9px;
+  position: absolute;
+  width: 9px;
+}
+
+.intro-splash__moon--one {
+  right: -32px;
+  top: 42%;
+}
+
+.intro-splash__moon--two {
+  animation-delay: 210ms;
+  bottom: 6%;
+  left: 10%;
+}
+
+.intro-splash__streak {
+  background: linear-gradient(100deg, transparent 0%, rgba(34, 211, 238, 0.08) 38%, rgba(255, 255, 255, 0.95) 50%, rgba(56, 189, 248, 0.18) 62%, transparent 100%);
+  height: 5px;
+  top: 43%;
+  transform: translateX(-120%) rotate(-13deg);
+  transform-origin: center;
+}
+
+.intro-splash__rocket {
+  height: 24px;
+  left: -90px;
+  top: 38%;
+  width: 84px;
+}
+
+.intro-splash.is-started .intro-splash__content {
+  animation: titleHold 6500ms ease-in-out both;
+}
+
+.intro-splash.is-started .intro-splash__streak {
+  animation: streakFlash 1800ms cubic-bezier(0.12, 0.74, 0.18, 1) both 1850ms;
+}
+
+.intro-splash.is-started .intro-splash__rocket {
+  animation: rocketFly 2300ms cubic-bezier(0.1, 0.78, 0.16, 1) both 1650ms;
+}
+
+.intro-splash:not(.is-started) .intro-splash__planet {
+  display: none;
+}
+
+.intro-splash__rocket::before {
+  background: linear-gradient(90deg, #f8fafc, #67e8f9);
+  border-radius: 999px 60% 60% 999px;
+  box-shadow: 0 0 24px rgba(103, 232, 249, 0.7);
+  content: '';
+  height: 16px;
+  position: absolute;
+  right: 0;
+  top: 4px;
+  width: 54px;
+}
+
+.intro-splash__rocket::after {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0), #fbbf24, #38bdf8);
+  border-radius: 999px;
+  content: '';
+  height: 8px;
+  left: 0;
+  position: absolute;
+  top: 8px;
+  width: 46px;
+}
+
+.intro-splash__rocket span {
+  border-bottom: 8px solid transparent;
+  border-left: 13px solid #38bdf8;
+  border-top: 8px solid transparent;
+  position: absolute;
+  right: -8px;
+  top: 4px;
+}
+
+@keyframes rocketFly {
+  0% { opacity: 0; transform: translateX(0) translateY(64px) rotate(-13deg); }
+  10% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(calc(100vw + 160px)) translateY(-96px) rotate(-13deg); }
+}
+
+@keyframes streakFlash {
+  0% { opacity: 0; transform: translateX(-120%) rotate(-13deg); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(120%) rotate(-13deg); }
+}
+
+@keyframes titleIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes titleHold {
+  0%, 78% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.42; }
+  50% { opacity: 1; }
+}
+
+@keyframes planetIn {
+  0%, 34% { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(0deg); }
+  44% { opacity: 1; transform: translate(-50%, -50%) scale(0.82) rotate(18deg); }
+  76% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(46deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.12) rotate(68deg); }
+}
+
+@keyframes orbitSpin {
+  to { transform: rotate(342deg) scaleY(0.34); }
+}
+
+@keyframes moonBeat {
+  0%, 100% { opacity: 0.45; transform: scale(0.86); }
+  50% { opacity: 1; transform: scale(1.18); }
+}

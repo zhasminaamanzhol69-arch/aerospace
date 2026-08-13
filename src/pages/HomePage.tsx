@@ -8,6 +8,7 @@ import { DigitalTwinPanel } from '../components/DigitalTwinPanel';
 import { DomainContextPanel } from '../components/DomainContextPanel';
 import { EngineeringCalculator } from '../components/EngineeringCalculator';
 import { FaqSection } from '../components/FaqSection';
+import { IntroSplash } from '../components/IntroSplash';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { MissionInputForm } from '../components/MissionInputForm';
 import { ProfileMenu } from '../components/ProfileMenu';
@@ -22,7 +23,7 @@ import {
   type MissionRequirements,
 } from '../lib/aerospace';
 import type { EngineeringStage } from '../lib/engineeringStage';
-import { LanguageContext, type Language } from '../lib/language';
+import { useLanguage } from '../lib/language';
 import {
   clearUserProfile,
   loadUserProfile,
@@ -51,8 +52,10 @@ const heroText = {
 };
 
 export function HomePage() {
-  const [language, setLanguage] = useState<Language>('ru');
-  const [profile, setProfile] = useState<UserProfile | null>(() => loadUserProfile());
+  const { language } = useLanguage();
+  const initialProfile = useMemo(() => loadUserProfile(), []);
+  const [profile, setProfile] = useState<UserProfile | null>(initialProfile);
+  const [showIntro, setShowIntro] = useState(true);
   const [stage, setStage] = useState<EngineeringStage>('design');
   const [requirements, setRequirements] = useState<MissionRequirements>(defaultRequirements);
   const parameters = useMemo(() => calculateMissionParameters(requirements), [requirements]);
@@ -88,7 +91,9 @@ export function HomePage() {
   }
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage }}>
+    showIntro && !profile ? (
+      <IntroSplash onDone={() => setShowIntro(false)} />
+    ) : (
       <main className="container mission-page">
         <div className="top-bar">
           {profile && <SiteMenu />}
@@ -145,6 +150,6 @@ export function HomePage() {
           </>
         )}
       </main>
-    </LanguageContext.Provider>
+    )
   );
 }
