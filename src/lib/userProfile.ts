@@ -7,7 +7,11 @@ export type UserProfile = {
   email?: string;
   phone?: string;
   provider?: 'local' | 'google';
+  subscription?: SubscriptionPlan;
+  avatarUrl?: string;
 };
+
+export type SubscriptionPlan = 'free' | 'pro' | 'trial';
 
 const profileKey = 'aerospace-user-profile';
 
@@ -26,6 +30,8 @@ export function loadUserProfile() {
       email: parsed.email,
       phone: parsed.phone,
       provider: parsed.provider,
+      subscription: getSubscription(parsed.subscription),
+      avatarUrl: parsed.avatarUrl,
     };
   } catch {
     return null;
@@ -52,10 +58,16 @@ export function buildAuthProfile(user: User): UserProfile {
     email,
     phone: getStringMetadata(user, 'phone'),
     provider: user.app_metadata.provider === 'google' ? 'google' : 'local',
+    subscription: getSubscription(getStringMetadata(user, 'subscription')),
+    avatarUrl: getStringMetadata(user, 'avatar_url') || getStringMetadata(user, 'picture'),
   };
 }
 
 function getStringMetadata(user: User, key: string) {
   const value = user.user_metadata[key];
   return typeof value === 'string' ? value : '';
+}
+
+function getSubscription(value: unknown): SubscriptionPlan {
+  return value === 'pro' || value === 'trial' ? value : 'free';
 }

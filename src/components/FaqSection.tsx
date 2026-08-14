@@ -1,4 +1,5 @@
 import { ProContent } from './ProContent';
+import { ReviewsSection } from './ReviewsSection';
 import { useLanguage, type Language } from '../lib/language';
 import './FaqSection.css';
 
@@ -75,7 +76,11 @@ const text: Record<Language, {
   },
 };
 
-export function FaqSection() {
+type Props = {
+  canReview: boolean;
+};
+
+export function FaqSection({ canReview }: Props) {
   const { language } = useLanguage();
   const copy = text[language];
 
@@ -99,6 +104,7 @@ export function FaqSection() {
         subtitle={copy.proSubtitle}
         title={copy.proTitle}
       />
+      <ReviewsSection canReview={canReview} />
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { CalculatedParameters, MissionRequirements } from '../lib/aerospace';
 import { buildEngineeringCalculations } from '../lib/engineeringCalculator';
+import { useLanguage, type Language } from '../lib/language';
 import './EngineeringCalculator.css';
 
 type Props = {
@@ -8,7 +9,47 @@ type Props = {
   parameters: CalculatedParameters;
 };
 
+const calculatorText: Record<Language, {
+  eyebrow: string;
+  title: string;
+  body: string;
+  selected: string;
+  formula: string;
+  inputs: string;
+  result: string;
+}> = {
+  kk: {
+    eyebrow: 'Инженерлік калькулятор',
+    title: 'Инженерлік есептеулер',
+    body: 'Формула, бастапқы деректер, өлшем бірліктері және есептеу нәтижесі.',
+    selected: 'Таңдалған есеп',
+    formula: 'Формула',
+    inputs: 'Бастапқы деректер',
+    result: 'Нәтиже',
+  },
+  ru: {
+    eyebrow: 'Инженерный калькулятор',
+    title: 'Инженерные расчёты',
+    body: 'Формула, исходные данные, единицы измерения и расчётный результат.',
+    selected: 'Выбранный расчёт',
+    formula: 'Формула',
+    inputs: 'Исходные данные',
+    result: 'Результат',
+  },
+  en: {
+    eyebrow: 'Engineering Calculator',
+    title: 'Engineering Calculator',
+    body: 'Formula, input data, units, and calculated result.',
+    selected: 'Selected calculation',
+    formula: 'Formula',
+    inputs: 'Input data',
+    result: 'Result',
+  },
+};
+
 export function EngineeringCalculator({ requirements, parameters }: Props) {
+  const { language } = useLanguage();
+  const copy = calculatorText[language];
   const calculations = useMemo(
     () => buildEngineeringCalculations(requirements, parameters),
     [requirements, parameters],
@@ -20,9 +61,9 @@ export function EngineeringCalculator({ requirements, parameters }: Props) {
     <section className="card engineering-calculator">
       <div className="calculator-header">
         <div>
-          <p className="eyebrow">Engineering Calculator</p>
-          <h2>Инженерный калькулятор</h2>
-          <p>Формула, исходные данные, единицы измерения и расчётный результат.</p>
+          <p className="eyebrow">{copy.eyebrow}</p>
+          <h2>{copy.title}</h2>
+          <p>{copy.body}</p>
         </div>
       </div>
 
@@ -41,21 +82,21 @@ export function EngineeringCalculator({ requirements, parameters }: Props) {
 
       <article className="calculator-result">
         <div>
-          <span>Выбранный расчёт</span>
+          <span>{copy.selected}</span>
           <h3>{selected.title}</h3>
         </div>
         <div className="formula-box">
-          <span>Формула</span>
+          <span>{copy.formula}</span>
           <strong>{selected.formula}</strong>
         </div>
         <div className="input-list">
-          <span>Исходные данные</span>
+          <span>{copy.inputs}</span>
           {selected.inputs.map((input) => (
             <strong key={input}>{input}</strong>
           ))}
         </div>
         <div className="result-box">
-          <span>Результат</span>
+          <span>{copy.result}</span>
           <strong>{selected.result}</strong>
         </div>
         <p>{selected.note}</p>

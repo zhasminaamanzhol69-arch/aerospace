@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'wouter';
 import type { UserProfile } from '../lib/userProfile';
 import { useLanguage, type Language } from '../lib/language';
 import './ProfileMenu.css';
@@ -8,10 +9,10 @@ type Props = {
   onLogout: () => void;
 };
 
-const text: Record<Language, { profile: string; name: string; nickname: string; logout: string }> = {
-  kk: { profile: 'Профиль', name: 'Аты-жөні', nickname: 'Ник', logout: 'Шығу' },
-  ru: { profile: 'Профиль', name: 'Имя', nickname: 'Ник', logout: 'Выйти' },
-  en: { profile: 'Profile', name: 'Name', nickname: 'Nickname', logout: 'Log out' },
+const text: Record<Language, { profile: string; name: string; nickname: string; open: string; logout: string }> = {
+  kk: { profile: 'Профиль', name: 'Аты-жөні', nickname: 'Ник', open: 'Менің профилім', logout: 'Шығу' },
+  ru: { profile: 'Профиль', name: 'Имя', nickname: 'Ник', open: 'Мой профиль', logout: 'Выйти' },
+  en: { profile: 'Profile', name: 'Name', nickname: 'Nickname', open: 'My profile', logout: 'Log out' },
 };
 
 export function ProfileMenu({ profile, onLogout }: Props) {
@@ -35,6 +36,9 @@ export function ProfileMenu({ profile, onLogout }: Props) {
           <h3>{copy.profile}</h3>
           <p>{copy.name}: {profile.name}</p>
           <p>{copy.nickname}: @{profile.nickname}</p>
+          <Link className="profile-menu__link" href="/profile" onClick={() => setIsOpen(false)}>
+            {copy.open}
+          </Link>
           <button className="profile-menu__logout" onClick={onLogout} type="button">
             <span aria-hidden="true">↪</span>
             {copy.logout}

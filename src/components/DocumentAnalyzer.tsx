@@ -87,13 +87,13 @@ export function DocumentAnalyzer() {
       {status && <p className="document-status">{status}</p>}
       {sources.length > 0 && (
         <div className="document-sources">
-          <strong>Source Attribution</strong>
+          <strong>{copy.sources}</strong>
           {sources.map((source) => <span key={source}>{source}</span>)}
         </div>
       )}
       {diff.length > 0 && (
         <div className="document-diff">
-          <strong>Revision Diff</strong>
+          <strong>{copy.diff}</strong>
           {diff.map((item) => <span className={item.type} key={`${item.type}-${item.line}`}>{item.type === 'added' ? '+ ' : '- '}{item.line}</span>)}
         </div>
       )}

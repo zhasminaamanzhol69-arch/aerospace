@@ -12,6 +12,8 @@ type DocumentAnalyzerCopy = {
   analyzing: string;
   done: string;
   chars: string;
+  sources: string;
+  diff: string;
   quick: string[];
 };
 
@@ -28,6 +30,8 @@ export const documentAnalyzerText: Record<Language, DocumentAnalyzerCopy> = {
     analyzing: 'Құжат талданып жатыр...',
     done: 'Талдау дайын.',
     chars: 'таңба',
+    sources: 'Дереккөздер',
+    diff: 'Редакциялар айырмасы',
     quick: ['Бұл торапқа қандай талаптар қойылады?', 'Сапа бақылауы бойынша барлық талаптарды тап.', 'Қандай тармақтар пайдалануға қатысты?', 'Бұл редакцияны алдыңғысымен салыстыр.'],
   },
   ru: {
@@ -42,6 +46,8 @@ export const documentAnalyzerText: Record<Language, DocumentAnalyzerCopy> = {
     analyzing: 'Анализирую документ...',
     done: 'Анализ готов.',
     chars: 'символов',
+    sources: 'Источники в документе',
+    diff: 'Сравнение редакций',
     quick: ['Какие требования предъявляются к этому узлу?', 'Найди все требования по контролю качества.', 'Какие пункты относятся к эксплуатации?', 'Сравни эту редакцию с предыдущей.'],
   },
   en: {
@@ -56,6 +62,8 @@ export const documentAnalyzerText: Record<Language, DocumentAnalyzerCopy> = {
     analyzing: 'Analyzing document...',
     done: 'Analysis ready.',
     chars: 'characters',
+    sources: 'Source Attribution',
+    diff: 'Revision Diff',
     quick: ['What requirements apply to this assembly?', 'Find all quality-control requirements.', 'Which clauses relate to operations?', 'Compare this revision with the previous one.'],
   },
 };

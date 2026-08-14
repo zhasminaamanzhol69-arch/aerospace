@@ -6,6 +6,7 @@ import {
 } from './engineeringStage';
 import { aiReportFormat } from './aiReportFormat';
 import type { Language } from './language';
+import { isGeneralKnowledgeQuestion, isInAerospaceScope } from './questionIntent';
 
 const languageName: Record<Language, string> = {
   kk: 'казахский',
@@ -21,6 +22,28 @@ export function buildEngineeringPrompt(
   stage: EngineeringStage,
   userQuestion: string,
 ) {
+  if (!isInAerospaceScope(userQuestion)) {
+    return [
+      `Вопрос пользователя: ${userQuestion}`,
+      `Язык ответа: ${languageName[language]}.`,
+      'Тип вопроса: вне тематики сайта.',
+      'Коротко откажись отвечать по этой теме.',
+      'Объясни, что Vectori отвечает только на вопросы про космос, дроны/авиацию, материалы, производство, испытания, эксплуатацию, телеметрию и инженерные документы.',
+      'Не добавляй инженерные расчёты, стандарты или длинный отчет.',
+    ].join('\n\n').trim();
+  }
+
+  const isGeneral = isGeneralKnowledgeQuestion(userQuestion);
+  if (isGeneral) {
+    return [
+      `Вопрос пользователя: ${userQuestion}`,
+      `Язык ответа: ${languageName[language]}.`,
+      'Тип вопроса: общий справочный вопрос.',
+      'Ответь кратко, простым языком, без инженерного шаблона, без MTOW/MOS/NDT, без стандартов и без расшифровки слова как аббревиатуры, если пользователь прямо не попросил инженерный смысл.',
+      'Объем: 2-4 предложения.',
+    ].join('\n\n').trim();
+  }
+
   return [
     `Задача пользователя: ${userQuestion}`,
     `Язык ответа: ${languageName[language]}.`,

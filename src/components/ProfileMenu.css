@@ -52,6 +52,18 @@
   line-height: 1.45;
 }
 
+.profile-menu__link {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 12px;
+  text-align: center;
+  text-decoration: none;
+}
+
 .profile-menu__logout {
   align-items: center;
   background: rgba(239, 68, 68, 0.12);

@@ -4,6 +4,7 @@ import { buildEngineeringPrompt } from './aiEngineeringPrompt';
 import type { EngineeringStage } from './engineeringStage';
 import { buildFallbackEngineeringReport } from './fallbackEngineeringReport';
 import type { Language } from './language';
+import { detectAnswerLanguage } from './questionIntent';
 
 type AiResponse = {
   text?: string;
@@ -24,15 +25,17 @@ export async function generateEngineeringReport(
   stage: EngineeringStage,
   userQuestion: string,
 ) {
+  const answerLanguage = detectAnswerLanguage(userQuestion, language);
+
   if (!isSupabaseConfigured) {
-    return buildFallbackEngineeringReport(requirements, parameters, options, language, stage, userQuestion);
+    return buildFallbackEngineeringReport(requirements, parameters, options, answerLanguage, stage, userQuestion);
   }
 
   try {
     const { data, error } = await supabase.functions.invoke<AiResponse>('ai', {
       body: {
-        system: buildSystemPrompt(language),
-        prompt: buildEngineeringPrompt(requirements, parameters, options, language, stage, userQuestion),
+        system: buildSystemPrompt(answerLanguage),
+        prompt: buildEngineeringPrompt(requirements, parameters, options, answerLanguage, stage, userQuestion),
       },
     });
 
@@ -42,7 +45,7 @@ export async function generateEngineeringReport(
 
     return data.text;
   } catch {
-    return buildFallbackEngineeringReport(requirements, parameters, options, language, stage, userQuestion);
+    return buildFallbackEngineeringReport(requirements, parameters, options, answerLanguage, stage, userQuestion);
   }
 }
 
@@ -50,7 +53,10 @@ function buildSystemPrompt(language: Language) {
   return [
     'Ты Aerospace Engineering Agent: экспертный инженерный ассистент для авиации, UAV и космических аппаратов.',
     'Работай на этапах Жобалау / Проектирование, Дайындау / Производство, Пайдалану / Эксплуатация.',
-    `Отвечай на языке: ${languageName[language]}.`,
+    `Отвечай строго на одном языке: ${languageName[language]}. Не смешивай русский, казахский и английский в одном ответе без необходимости.`,
+    'Отвечай только по тематике сайта: космос, дроны/авиация, космические аппараты, материалы, производство, испытания, эксплуатация, телеметрия и инженерные документы.',
+    'Если вопрос не относится к этой тематике, коротко откажись и предложи задать вопрос по аэрокосмической инженерии.',
+    'Если вопрос общий, не инженерный, ответь коротко как справочник и не притягивай его к аббревиатурам, MTOW, MOS, Fixed Wing или стандартам.',
     'Отвечай по выбранному этапу и вопросу пользователя; не выводи три этапа сразу без прямой просьбы.',
     'Ссылайся только на реальные нормативно-технические документы: ECSS, NASA Technical Standards, ISO, ГОСТ, FAA, ЕСКД или другие релевантные стандарты.',
     'Номера пунктов, разделов, таблиц, коэффициенты, прочность, допуски и лимиты приводи только если они есть в доступном контексте или ты точно знаешь источник.',

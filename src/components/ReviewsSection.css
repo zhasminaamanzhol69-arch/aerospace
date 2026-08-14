@@ -1,0 +1,122 @@
+.reviews-section {
+  background: linear-gradient(135deg, rgba(17, 38, 58, 0.92), rgba(7, 17, 31, 0.82));
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.reviews-section h3 {
+  font-size: 20px;
+  margin: 6px 0 8px;
+}
+
+.reviews-section p,
+.reviews-section label span,
+.reviews-section time {
+  color: var(--soft);
+  line-height: 1.5;
+}
+
+.reviews-section__stars {
+  display: flex;
+  gap: 6px;
+}
+
+.reviews-section__stars button {
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  color: var(--soft);
+  font-size: 24px;
+  height: 42px;
+  padding: 0;
+  width: 42px;
+}
+
+.reviews-section__stars button.is-active {
+  color: #fbbf24;
+}
+
+.reviews-section label {
+  display: grid;
+  gap: 8px;
+}
+
+.reviews-section textarea {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--bg);
+  font: inherit;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.reviews-section__message {
+  font-size: 14px;
+}
+
+.reviews-section__list {
+  display: grid;
+  gap: 10px;
+}
+
+.reviews-section__item {
+  background: rgba(7, 17, 31, 0.5);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
+
+.reviews-section__item strong {
+  color: #fbbf24;
+  letter-spacing: 1px;
+}
+
+.reviews-section__demo-header {
+  align-items: center;
+  display: flex;
+  margin-top: 4px;
+}
+
+.reviews-section__demo-header h4 {
+  font-size: 18px;
+}
+
+.reviews-section__demo-window {
+  overflow: hidden;
+  padding-bottom: 6px;
+}
+
+.reviews-section__demo-track {
+  animation: reviews-marquee 80s linear infinite;
+  display: flex;
+  gap: 12px;
+  width: max-content;
+}
+
+.reviews-section__demo-window:hover .reviews-section__demo-track {
+  animation-play-state: paused;
+}
+
+.reviews-section__demo-card {
+  background: rgba(7, 17, 31, 0.55);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 8px;
+  display: grid;
+  flex: 0 0 min(280px, 82vw);
+  gap: 8px;
+  padding: 14px;
+}
+
+.reviews-section__demo-card span {
+  color: #fbbf24;
+}
+
+@keyframes reviews-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-50% - 6px)); }
+}

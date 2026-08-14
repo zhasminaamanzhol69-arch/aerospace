@@ -20,7 +20,6 @@ export function AiEngineeringReport({ stage, requirements, parameters, options }
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const copy = aiReportText[language];
-  const best = options[0];
 
   useEffect(() => {
     setError('');
@@ -59,17 +58,10 @@ export function AiEngineeringReport({ stage, requirements, parameters, options }
     <section className="card ai-report">
       <div className="ai-report__header">
         <div>
-          <p className="eyebrow">AI Engineering Report</p>
+          <p className="eyebrow">{copy.eyebrow}</p>
           <h2>{copy.title}</h2>
           <p className="ai-report__subtitle">{copy.subtitle}</p>
         </div>
-      </div>
-
-      <div className="ai-report__params">
-        <span>{copy.base}: {best.name}</span>
-        <strong>{parameters.estimatedTakeoffMassKg} kg</strong>
-        <strong>{parameters.requiredPowerW} W</strong>
-        <strong>{copy.risk[best.risk]}</strong>
       </div>
 
       <label className="ai-report__input">
@@ -89,11 +81,6 @@ export function AiEngineeringReport({ stage, requirements, parameters, options }
       {error && <p className="message">{error}</p>}
       {report ? (
         <article className="ai-report__result">
-          <div className="ai-report__flow" aria-label="AI report structure">
-            <span>Решение</span>
-            <span>Нормативы / Стандарты</span>
-            <span>Риски</span>
-          </div>
           <p className="ai-report__text">{report}</p>
         </article>
       ) : (

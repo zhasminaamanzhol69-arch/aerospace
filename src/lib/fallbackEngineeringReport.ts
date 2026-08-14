@@ -1,12 +1,15 @@
 import type { CalculatedParameters, DesignOption, MissionRequirements } from './aerospace';
 import type { EngineeringStage } from './engineeringStage';
 import type { Language } from './language';
-
-const stageName: Record<Language, Record<EngineeringStage, string>> = {
-  kk: { design: 'ЖОБАЛАУ', manufacturing: 'ДАЙЫНДАУ', operations: 'ПАЙДАЛАНУ' },
-  ru: { design: 'ПРОЕКТИРОВАНИЕ', manufacturing: 'ПРОИЗВОДСТВО', operations: 'ЭКСПЛУАТАЦИЯ' },
-  en: { design: 'DESIGN', manufacturing: 'MANUFACTURING', operations: 'OPERATIONS' },
-};
+import {
+  buildGeneralFallback,
+  buildOutOfScopeFallback,
+  materialName,
+  processName,
+  selectByStage,
+  stageName,
+} from './fallbackReportHelpers';
+import { isGeneralKnowledgeQuestion, isInAerospaceScope } from './questionIntent';
 
 export function buildFallbackEngineeringReport(
   req: MissionRequirements,
@@ -16,6 +19,8 @@ export function buildFallbackEngineeringReport(
   stage: EngineeringStage,
   question: string,
 ) {
+  if (!isInAerospaceScope(question)) return buildOutOfScopeFallback(language);
+  if (isGeneralKnowledgeQuestion(question)) return buildGeneralFallback(question, language);
   if (language === 'en') return buildEnglishReport(req, params, options, stage, question);
   if (language === 'kk') return buildKazakhReport(req, params, options, stage, question);
   return buildRussianReport(req, params, options, stage, question);
@@ -123,23 +128,4 @@ function commonReport(data: {
 Стандарты: ${data.standards} ${unknown}
 
 Риски: ${data.risks}`;
-}
-
-function selectByStage(stage: EngineeringStage, values: Record<EngineeringStage, string>) {
-  return values[stage];
-}
-
-function materialName(material: string) {
-  if (material === 'carbon') return 'CFRP';
-  if (material === 'titanium') return 'Ti-6Al-4V';
-  if (material === 'aluminum-7075') return 'Al 7075-T6';
-  if (material === 'aluminum-2024') return 'Al 2024';
-  return material;
-}
-
-function processName(process: string) {
-  if (process === 'autoclave') return 'автоклавное формование';
-  if (process === 'dmls') return 'DMLS additive manufacturing';
-  if (process === 'cnc') return 'ЧПУ-фрезерование';
-  return process;
 }
