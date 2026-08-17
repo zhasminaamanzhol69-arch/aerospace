@@ -9,44 +9,6 @@ type Props = {
   parameters: CalculatedParameters;
 };
 
-const calculatorText: Record<Language, {
-  eyebrow: string;
-  title: string;
-  body: string;
-  selected: string;
-  formula: string;
-  inputs: string;
-  result: string;
-}> = {
-  kk: {
-    eyebrow: 'Инженерлік калькулятор',
-    title: 'Инженерлік есептеулер',
-    body: 'Формула, бастапқы деректер, өлшем бірліктері және есептеу нәтижесі.',
-    selected: 'Таңдалған есеп',
-    formula: 'Формула',
-    inputs: 'Бастапқы деректер',
-    result: 'Нәтиже',
-  },
-  ru: {
-    eyebrow: 'Инженерный калькулятор',
-    title: 'Инженерные расчёты',
-    body: 'Формула, исходные данные, единицы измерения и расчётный результат.',
-    selected: 'Выбранный расчёт',
-    formula: 'Формула',
-    inputs: 'Исходные данные',
-    result: 'Результат',
-  },
-  en: {
-    eyebrow: 'Engineering Calculator',
-    title: 'Engineering Calculator',
-    body: 'Formula, input data, units, and calculated result.',
-    selected: 'Selected calculation',
-    formula: 'Formula',
-    inputs: 'Input data',
-    result: 'Result',
-  },
-};
-
 export function EngineeringCalculator({ requirements, parameters }: Props) {
   const { language } = useLanguage();
   const copy = calculatorText[language];

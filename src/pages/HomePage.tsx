@@ -136,7 +136,7 @@ export function HomePage() {
           </section>
         )}
 
-        <FaqSection />
+        <FaqSection canReview={Boolean(profile)} />
           </>
         )}
       </main>
