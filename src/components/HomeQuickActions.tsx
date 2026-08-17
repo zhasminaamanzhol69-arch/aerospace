@@ -17,7 +17,7 @@ const quickText = {
     ask: 'Спросить AI',
     docs: 'Анализ PDF/DOCX',
     drones: 'Виды дронов',
-    space: 'CubeSat / Satellite',
+    space: 'Кубсаты и спутники',
   },
   en: {
     eyebrow: 'Quick actions',

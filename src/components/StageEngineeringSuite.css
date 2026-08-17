@@ -77,4 +77,18 @@
   .stage-chart label {
     grid-template-columns: 1fr;
   }
+
+  .stage-suite__table,
+  .telemetry-live {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-suite__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .stage-suite__actions button {
+    width: 100%;
+  }
 }

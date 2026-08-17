@@ -29,7 +29,7 @@ export function MissionInputForm({ stage, requirements, onChange }: Props) {
 
   return (
     <section className="card mission-card">
-      <p className="eyebrow">Mission Requirements</p>
+      <p className="eyebrow">{language === 'ru' ? 'Требования миссии' : language === 'kk' ? 'Миссия талаптары' : 'Mission Requirements'}</p>
       <h2>{copy.title}</h2>
       <div className="field-grid">
         {getMissionInputFields(stage, requirements.vehicleDomain).map((field) => (

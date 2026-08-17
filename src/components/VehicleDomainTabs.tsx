@@ -17,16 +17,16 @@ const text: Record<Language, {
   kk: {
     title: 'Аппарат класы',
     aviation: 'Авиация / БПЛА',
-    aviationHint: 'Atmospheric Flight',
+    aviationHint: 'Атмосфералық ұшу',
     spacecraft: 'Космонавтика / Спутниктер',
-    spacecraftHint: 'Spacecraft & Payload',
+    spacecraftHint: 'Ғарыш аппараты және пайдалы жүк',
   },
   ru: {
     title: 'Тип аппарата',
     aviation: 'Авиация / БПЛА',
-    aviationHint: 'Atmospheric Flight',
+    aviationHint: 'Полёт в атмосфере',
     spacecraft: 'Космонавтика / Спутники',
-    spacecraftHint: 'Spacecraft & Payload',
+    spacecraftHint: 'Космический аппарат и полезная нагрузка',
   },
   en: {
     title: 'Vehicle domain',

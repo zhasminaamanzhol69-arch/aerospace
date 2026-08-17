@@ -1,5 +1,7 @@
 import { buildLocalDocumentAnswer } from './documentAnalysis';
 import type { ExtractedDocument } from './documentExtraction';
+import { buildOutOfScopeDocumentAnswer, isAerospaceDocument } from './aiTopicGuard';
+import type { Language } from './language';
 import { isSupabaseConfigured, supabase } from './supabase';
 
 type AiResponse = { text?: string; error?: string };
@@ -8,7 +10,12 @@ export async function answerDocumentQuestion(
   current: ExtractedDocument,
   question: string,
   previous?: ExtractedDocument | null,
+  language: Language = 'ru',
 ) {
+  if (!isAerospaceDocument(current.name, current.text)) {
+    return buildOutOfScopeDocumentAnswer(language);
+  }
+
   if (!isSupabaseConfigured) return buildLocalDocumentAnswer(current, question, previous);
 
   try {

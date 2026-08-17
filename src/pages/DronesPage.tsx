@@ -22,7 +22,7 @@ export function DronesPage() {
       </div>
 
       <section className="drone-hero">
-        <p className="eyebrow">Rescue UAV Systems</p>
+        <p className="eyebrow">{copy.heroEyebrow}</p>
         <h1>{copy.heroTitle}</h1>
         <p>{copy.heroBody}</p>
       </section>
@@ -41,7 +41,7 @@ export function DronesPage() {
       </section>
 
       <section className="card rescue-checklist">
-        <p className="eyebrow">Rescue Mission Checklist</p>
+        <p className="eyebrow">{copy.checklistEyebrow}</p>
         <h2>{copy.checklistTitle}</h2>
         <ol>
           {copy.checks.map((check) => <li key={check}>{check}</li>)}

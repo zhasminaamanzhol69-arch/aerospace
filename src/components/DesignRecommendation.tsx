@@ -27,11 +27,11 @@ const text: Record<Language, {
   },
   ru: {
     titles: { design: 'Рекомендуемая конфигурация', manufacturing: 'Производственный маршрут', operations: 'Регламент эксплуатации' },
-    labels: ['Score', 'Mass', 'Power', 'Risk'],
-    risk: { Low: 'Low', Medium: 'Medium', High: 'High' },
+    labels: ['Оценка', 'Масса', 'Мощность', 'Риск'],
+    risk: { Low: 'Низкий', Medium: 'Средний', High: 'Высокий' },
     summaries: { Multirotor: 'Лучше для вертикального взлёта, точной посадки и тестов прототипа.', 'Fixed Wing': 'Самый энергоэффективный вариант для дальности и длительного полёта.', 'Hybrid VTOL': 'Компромисс: вертикальный старт плюс экономичный маршрутный полёт.', 'CubeSat / Satellite': 'Подходит для орбитальной полезной нагрузки и ограниченного габарита.' },
-    stageSummaries: { design: 'Аэродинамика, прочностной расчёт, расчёт мощности и выбор схемы аппарата.', manufacturing: 'Допуски обработки, технологические риски, ультразвук/рентген и сборка узлов.', operations: 'Регламент ТО, анализ износа по телеметрии Digital Twin, RTH и предполётный контроль.' },
-    stageOptions: { design: ['Fixed Wing', 'Hybrid VTOL', 'Multirotor', 'CubeSat / Satellite'], manufacturing: ['Допуски', 'Ультразвук', 'Рентген'], operations: ['ТО', 'Digital Twin', 'RTH'] },
+    stageSummaries: { design: 'Аэродинамика, прочностной расчёт, расчёт мощности и выбор схемы аппарата.', manufacturing: 'Допуски обработки, технологические риски, ультразвук/рентген и сборка узлов.', operations: 'Регламент ТО, анализ износа по телеметрии цифрового двойника, аварийный возврат и предполётный контроль.' },
+    stageOptions: { design: ['Самолётная схема', 'Гибридный вертикальный взлёт', 'Мультиротор', 'Кубсат / спутник'], manufacturing: ['Допуски', 'Ультразвук', 'Рентген'], operations: ['ТО', 'Цифровой двойник', 'Аварийный возврат'] },
   },
   en: {
     titles: { design: 'Recommended configuration', manufacturing: 'Manufacturing route', operations: 'Operations regulation' },
@@ -47,12 +47,15 @@ export function DesignRecommendation({ stage, options, requirements }: Props) {
   const { language } = useLanguage();
   const copy = text[language];
   const best = options[0];
-  const headline = stage === 'design' ? getDesignHeadline(best.name, requirements) : getStageHeadline(stage, requirements);
+  const headline = stage === 'design' ? getDesignHeadline(best.name, requirements, language) : getStageHeadline(stage, requirements, language);
 
   return (
     <section className="card mission-card recommendation-card">
       <p className="eyebrow">{copy.titles[stage]}</p>
-      <h2>{headline}</h2>
+      <h2 className="recommendation-headline">
+        <span>{headline.primary}</span>
+        <small>{headline.secondary}</small>
+      </h2>
       <p className="recommendation-summary">
         {stage === 'design' ? copy.summaries[best.name] : copy.stageSummaries[stage]}
       </p>
@@ -63,7 +66,7 @@ export function DesignRecommendation({ stage, options, requirements }: Props) {
         <Metric label={copy.labels[3]} value={copy.risk[best.risk]} />
       </div>
       <div className="option-list">
-        {(stage === 'design' ? getDesignOptions(options, requirements) : copy.stageOptions[stage]).map((item, index) => (
+        {(stage === 'design' ? getDesignOptions(options, requirements, language) : copy.stageOptions[stage]).map((item, index) => (
           <article className="option-card" key={item}>
             <span>{item}</span>
             <strong>{stage === 'design' ? options[index]?.score : Math.max(58, best.score - index * 7)}%</strong>
@@ -75,32 +78,34 @@ export function DesignRecommendation({ stage, options, requirements }: Props) {
   );
 }
 
-function getDesignHeadline(bestName: string, requirements: MissionRequirements) {
+function getDesignHeadline(bestName: string, requirements: MissionRequirements, language: Language) {
   if (requirements.vehicleDomain === 'spacecraft') {
-    return `CubeSat / Satellite / ${requirements.orbitClass.toUpperCase()}`;
+    const orbit = language === 'ru' ? orbitName(requirements.orbitClass) : requirements.orbitClass.toUpperCase();
+    return { primary: vehicleName('CubeSat / Satellite', language), secondary: orbit };
   }
 
-  return `${bestName} / ${getPropulsion(requirements)}`;
+  return { primary: vehicleName(bestName, language), secondary: getPropulsion(requirements, language) };
 }
 
-function getDesignOptions(options: DesignOption[], requirements: MissionRequirements) {
+function getDesignOptions(options: DesignOption[], requirements: MissionRequirements, language: Language) {
   if (requirements.vehicleDomain === 'spacecraft') {
+    if (language === 'ru') return ['Кубсат / спутник', 'Полезная нагрузка на низкой орбите', 'Полезная нагрузка на геостационарной орбите', 'Размещённая полезная нагрузка'];
     return ['CubeSat / Satellite', 'LEO payload', 'GEO payload', 'Hosted payload'];
   }
 
-  return options.map((option) => option.name);
+  return options.map((option) => vehicleName(option.name, language));
 }
 
 function MaterialProcessAnalysis() {
   const rows = [
-    { material: 'CFRP', strength: 'Высокая ★★★★★', process: 'Автоклав / Вакуум', risk: 'Расслоение' },
-    { material: 'Al 7075-T6', strength: 'Средняя ★★★☆☆', process: 'ЧПУ фрезерование', risk: 'Коррозия в узлах' },
-    { material: 'Ti-6Al-4V', strength: 'Высокая ★★★★☆', process: 'Сложная ЧПУ / Лазер', risk: 'Высокая стоимость' },
+    { material: 'Углепластик', strength: 'Высокая ★★★★★', process: 'Автоклав / вакуум', risk: 'Расслоение' },
+    { material: 'Алюминий 7075-Т6', strength: 'Средняя ★★★☆☆', process: 'ЧПУ-фрезерование', risk: 'Коррозия в узлах' },
+    { material: 'Титан ВТ6', strength: 'Высокая ★★★★☆', process: 'Сложная ЧПУ / лазер', risk: 'Высокая стоимость' },
   ];
 
   return (
     <div className="material-analysis">
-      <p className="eyebrow">Material & Process Analysis</p>
+      <p className="eyebrow">Анализ материалов и процессов</p>
       <div className="material-analysis__grid">
         {rows.map((row) => (
           <article className="material-analysis__item" key={row.material}>
@@ -115,23 +120,86 @@ function MaterialProcessAnalysis() {
   );
 }
 
-function getPropulsion(requirements: MissionRequirements) {
+function getPropulsion(requirements: MissionRequirements, language: Language) {
   const engine = requirements.vehicleScheme === 'cubesat-satellite' ? 'electric / reaction control' : requirements.engineType;
   const source = requirements.energySource === 'li-ion' ? 'Li-Ion/LiPo' : requirements.energySource;
+  if (language === 'ru') return `${engineName(engine)}, ${energyName(source)}`;
   return `${engine}, ${source}`;
 }
 
-function getStageHeadline(stage: EngineeringStage, requirements: MissionRequirements) {
-  if (stage === 'manufacturing') return `${materialName(requirements.material)} / ${requirements.jointMethod}`;
-  return `${requirements.environment} / ${requirements.checklistStatus}`;
+function getStageHeadline(stage: EngineeringStage, requirements: MissionRequirements, language: Language) {
+  if (stage === 'manufacturing') return { primary: materialName(requirements.material, language), secondary: jointName(requirements.jointMethod, language) };
+  if (language === 'ru') return { primary: environmentName(requirements.environment), secondary: checklistName(requirements.checklistStatus) };
+  return { primary: requirements.environment, secondary: requirements.checklistStatus };
 }
 
-function materialName(material: string) {
+function vehicleName(name: string, language: Language) {
+  if (language !== 'ru') return name;
+  if (name === 'Fixed Wing') return 'Самолётная схема';
+  if (name === 'Hybrid VTOL') return 'Гибридный вертикальный взлёт';
+  if (name === 'Multirotor') return 'Мультиротор';
+  if (name === 'CubeSat / Satellite') return 'Кубсат / спутник';
+  return name;
+}
+
+function orbitName(orbit: string) {
+  if (orbit === 'leo') return 'низкая околоземная орбита';
+  if (orbit === 'sso') return 'солнечно-синхронная орбита';
+  if (orbit === 'geo') return 'геостационарная орбита';
+  return orbit;
+}
+
+function engineName(engine: string) {
+  if (engine === 'electric') return 'электрическая тяга';
+  if (engine === 'hybrid') return 'гибридная тяга';
+  if (engine === 'turbine') return 'микротурбина';
+  if (engine === 'electric / reaction control') return 'электрическая тяга и система ориентации';
+  return engine;
+}
+
+function energyName(source: string) {
+  if (source === 'Li-Ion/LiPo') return 'литий-ионный/литий-полимерный аккумулятор';
+  if (source === 'fuel-cell') return 'водородный топливный элемент';
+  if (source === 'solar') return 'солнечное питание';
+  return source;
+}
+
+function materialName(material: string, language: Language) {
+  if (language === 'ru') {
+    if (material === 'carbon') return 'углепластик';
+    if (material === 'titanium') return 'титан';
+  }
   if (material === 'aluminum-2024') return 'Al 2024';
   if (material === 'aluminum-7075') return 'Al 7075';
   if (material === 'carbon') return 'CFRP';
   if (material === 'titanium') return 'Titanium';
   return material;
+}
+
+function jointName(joint: string, language: Language) {
+  if (language !== 'ru') return joint;
+  if (joint === 'riveting') return 'клёпка';
+  if (joint === 'welding') return 'сварка';
+  if (joint === 'laser-welding') return 'лазерная сварка';
+  if (joint === 'tig-welding') return 'аргонодуговая сварка';
+  if (joint === 'friction-welding') return 'сварка трением';
+  if (joint === 'adhesive') return 'клеевое соединение';
+  return joint;
+}
+
+function environmentName(environment: string) {
+  if (environment === 'normal') return 'нормальные условия';
+  if (environment === 'cold') return 'экстремальный холод';
+  if (environment === 'wind') return 'сильный ветер';
+  if (environment === 'space') return 'вакуум и радиация';
+  return environment;
+}
+
+function checklistName(status: string) {
+  if (status === 'ready') return 'готов';
+  if (status === 'partial') return 'частично готов';
+  if (status === 'blocked') return 'не готов';
+  return status;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {

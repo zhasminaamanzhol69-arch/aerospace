@@ -21,7 +21,7 @@ const tabs: Array<{
     },
     detail: {
       kk: 'Аэродинамика, беріктік, қуат',
-      ru: 'Design & Engineering',
+      ru: 'Аэродинамика, прочность, мощность',
       en: 'Aerodynamics, loads, power',
     },
   },
@@ -34,7 +34,7 @@ const tabs: Array<{
     },
     detail: {
       kk: 'Материал, қосылыс, жинақтау',
-      ru: 'Manufacturing & Assembly',
+      ru: 'Материалы, соединения, сборка',
       en: 'Materials, joining, assembly',
     },
   },
@@ -47,7 +47,7 @@ const tabs: Array<{
     },
     detail: {
       kk: 'Сынақ, телеметрия, қауіпсіздік',
-      ru: 'Operations & Telemetry',
+      ru: 'Испытания, телеметрия, безопасность',
       en: 'Testing, telemetry, safety',
     },
   },

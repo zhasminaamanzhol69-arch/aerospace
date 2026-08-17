@@ -4,6 +4,7 @@ import { documentAnalyzerText } from '../lib/documentAnalyzerText';
 import { extractDocumentText, type ExtractedDocument } from '../lib/documentExtraction';
 import { buildRevisionDiff, buildSourceAttribution } from '../lib/documentInsights';
 import { useLanguage } from '../lib/language';
+import { buildOutOfScopeDocumentAnswer, isAerospaceDocument } from '../lib/aiTopicGuard';
 import './DocumentAnalyzer.css';
 
 export function DocumentAnalyzer() {
@@ -45,10 +46,20 @@ export function DocumentAnalyzer() {
     setIsLoading(true);
     setStatus(copy.analyzing);
     setAnswer('');
+
+    if (!isAerospaceDocument(current.name, current.text)) {
+      setSources([]);
+      setDiff([]);
+      setAnswer(buildOutOfScopeDocumentAnswer(language));
+      setStatus(copy.done);
+      setIsLoading(false);
+      return;
+    }
+
     setSources(buildSourceAttribution(current, question));
     setDiff(buildRevisionDiff(current, previous));
 
-    const nextAnswer = await answerDocumentQuestion(current, question.trim(), previous);
+    const nextAnswer = await answerDocumentQuestion(current, question.trim(), previous, language);
     setAnswer(nextAnswer);
     setStatus(copy.done);
     setIsLoading(false);

@@ -105,7 +105,7 @@ export function HomePage() {
             <p>{text.body}</p>
           </div>
           <div className="flight-visual">
-            <img src={isSpacecraft ? spacecraftHeroImage : aviationHeroImage} alt={text.visualAlt} />
+            <img src={isSpacecraft ? spacecraftHeroImage : aviationHeroImage} alt={text.imageAlt} />
             <span className="telemetry telemetry--one">{isSpacecraft ? 'ORB LEO' : 'ALT 1200m'}</span>
             <span className="telemetry telemetry--two">{isSpacecraft ? 'SOL 180W' : 'BAT 78%'}</span>
           </div>
@@ -136,7 +136,7 @@ export function HomePage() {
           </section>
         )}
 
-        <FaqSection canReview={Boolean(profile.email)} />
+        <FaqSection />
           </>
         )}
       </main>

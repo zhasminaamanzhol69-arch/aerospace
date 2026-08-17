@@ -19,9 +19,9 @@ const menuText: Record<Language, {
   ru: {
     title: 'Разделы',
     sections: [
-      { href: '/', title: 'Главная', description: 'Aerospace Engineering Agent' },
-      { href: '/drones', title: 'Виды дронов', description: 'Спасательные UAV и сценарии применения' },
-      { href: '/spacecraft', title: 'Космические аппараты', description: 'CubeSat, Satellite и Payload' },
+      { href: '/', title: 'Главная', description: 'Инженерный ИИ-агент' },
+      { href: '/drones', title: 'Виды дронов', description: 'Спасательные БПЛА и сценарии применения' },
+      { href: '/spacecraft', title: 'Космические аппараты', description: 'Кубсаты, спутники и полезная нагрузка' },
       { href: '/documents', title: 'Анализ документов', description: 'PDF/DOCX, ТУ, ГОСТ, ОСТ' },
     ],
   },

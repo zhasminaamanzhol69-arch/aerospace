@@ -1,15 +1,13 @@
 import type { CalculatedParameters, DesignOption, MissionRequirements } from './aerospace';
 import type { EngineeringStage } from './engineeringStage';
+import { buildFallbackLearningAnswer } from './fallbackLearningAnswer';
 import type { Language } from './language';
-import {
-  buildGeneralFallback,
-  buildOutOfScopeFallback,
-  materialName,
-  processName,
-  selectByStage,
-  stageName,
-} from './fallbackReportHelpers';
-import { isGeneralKnowledgeQuestion, isInAerospaceScope } from './questionIntent';
+
+const stageName: Record<Language, Record<EngineeringStage, string>> = {
+  kk: { design: 'ЖОБАЛАУ', manufacturing: 'ДАЙЫНДАУ', operations: 'ПАЙДАЛАНУ' },
+  ru: { design: 'ПРОЕКТИРОВАНИЕ', manufacturing: 'ПРОИЗВОДСТВО', operations: 'ЭКСПЛУАТАЦИЯ' },
+  en: { design: 'DESIGN', manufacturing: 'MANUFACTURING', operations: 'OPERATIONS' },
+};
 
 export function buildFallbackEngineeringReport(
   req: MissionRequirements,
@@ -19,8 +17,9 @@ export function buildFallbackEngineeringReport(
   stage: EngineeringStage,
   question: string,
 ) {
-  if (!isInAerospaceScope(question)) return buildOutOfScopeFallback(language);
-  if (isGeneralKnowledgeQuestion(question)) return buildGeneralFallback(question, language);
+  const learningAnswer = buildFallbackLearningAnswer(question, language);
+  if (learningAnswer) return learningAnswer;
+
   if (language === 'en') return buildEnglishReport(req, params, options, stage, question);
   if (language === 'kk') return buildKazakhReport(req, params, options, stage, question);
   return buildRussianReport(req, params, options, stage, question);
@@ -33,19 +32,19 @@ function buildRussianReport(
   stage: EngineeringStage,
   question: string,
 ) {
-  const domain = req.vehicleDomain === 'spacecraft' ? 'космический аппарат CubeSat/Satellite' : 'авиационный аппарат / БПЛА';
+  const domain = req.vehicleDomain === 'spacecraft' ? 'космический аппарат кубсат/спутник' : 'авиационный аппарат / БПЛА';
   const designDecision = req.vehicleDomain === 'spacecraft'
-    ? `Для запроса "${question}" базовая архитектура: ${domain}, орбита ${req.orbitClass.toUpperCase()}, солнечная мощность ${req.solarArrayW} W.`
-    : `Для запроса "${question}" базовая архитектура: ${options[0]?.name ?? req.vehicleScheme}, материал ${materialName(req.material)}, MTOW ${params.estimatedTakeoffMassKg} kg.`;
+    ? `Для запроса "${question}" базовая архитектура: ${domain}, орбита ${orbitName(req.orbitClass)}, солнечная мощность ${req.solarArrayW} Вт.`
+    : `Для запроса "${question}" базовая архитектура: ${optionName(options[0]?.name ?? req.vehicleScheme)}, материал ${materialNameRu(req.material)}, взлётная масса ${params.estimatedTakeoffMassKg} кг.`;
 
   return commonReport({
     active: stageName.ru[stage],
     decision: selectByStage(stage, {
       design: designDecision,
-      manufacturing: `Рекомендуемый маршрут: ${materialName(req.material)}, процесс ${processName(req.manufacturingMethod)}, соединение ${req.jointMethod}.`,
+      manufacturing: `Рекомендуемый маршрут: ${materialNameRu(req.material)}, процесс ${processNameRu(req.manufacturingMethod)}, соединение ${req.jointMethod}.`,
       operations: req.vehicleDomain === 'spacecraft'
-      ? `Эксплуатация: контролировать энергобаланс, связь ${params.linkQualityPercent}% и терморежим ${req.thermalControl}.`
-      : `Эксплуатация: контролировать SoH ${req.batterySohPercent}%, RSSI ${req.linkRssiDbm} dBm и резерв RTH ${params.emergencyReservePercent}%.`,
+      ? `Эксплуатация: контролировать энергобаланс, связь ${params.linkQualityPercent}% и терморежим ${thermalName(req.thermalControl)}.`
+      : `Эксплуатация: контролировать состояние аккумулятора ${req.batterySohPercent}%, сигнал связи ${req.linkRssiDbm} dBm и резерв аварийного возврата ${params.emergencyReservePercent}%.`,
     }),
     standards: selectByStage(stage, {
       design: req.vehicleDomain === 'spacecraft'
@@ -56,7 +55,7 @@ function buildRussianReport(
       ? 'ECSS-E-ST-10-03C использовать для испытаний; FAA Part 107 не является основным нормативом для спутников.'
       : 'FAA Part 107, ИКАО и ГОСТ В 20.39.304 использовать для эксплуатационных ограничений и проверок.',
     }),
-    params: `Мощность ${params.requiredPowerW} W, энергия ${params.requiredEnergyWh} Wh, MOS ${params.marginOfSafety}, риск ${params.riskLevel}.`,
+    params: `Мощность ${params.requiredPowerW} Вт, энергия ${params.requiredEnergyWh} Вт·ч, запас прочности ${params.marginOfSafety}, риск ${riskName(params.riskLevel)}.`,
     risks: 'Проверить, что выбранный класс аппарата, среда и режим миссии совпадают; не переносить правила БПЛА на спутники и наоборот.',
     language: 'ru',
   });
@@ -128,4 +127,66 @@ function commonReport(data: {
 Стандарты: ${data.standards} ${unknown}
 
 Риски: ${data.risks}`;
+}
+
+function selectByStage(stage: EngineeringStage, values: Record<EngineeringStage, string>) {
+  return values[stage];
+}
+
+function materialName(material: string) {
+  if (material === 'carbon') return 'CFRP';
+  if (material === 'titanium') return 'Ti-6Al-4V';
+  if (material === 'aluminum-7075') return 'Al 7075-T6';
+  if (material === 'aluminum-2024') return 'Al 2024';
+  return material;
+}
+
+function processName(process: string) {
+  if (process === 'autoclave') return 'автоклавное формование';
+  if (process === 'dmls') return 'DMLS additive manufacturing';
+  if (process === 'cnc') return 'ЧПУ-фрезерование';
+  return process;
+}
+
+function materialNameRu(material: string) {
+  if (material === 'carbon') return 'углепластик';
+  if (material === 'titanium') return 'титан ВТ6';
+  if (material === 'aluminum-7075') return 'алюминий 7075-Т6';
+  if (material === 'aluminum-2024') return 'алюминий-литиевый сплав 2024';
+  return material;
+}
+
+function processNameRu(process: string) {
+  if (process === 'autoclave') return 'автоклавное формование';
+  if (process === 'dmls') return 'лазерное спекание металла';
+  if (process === 'cnc') return 'ЧПУ-фрезерование';
+  return process;
+}
+
+function optionName(option: string) {
+  if (option === 'Fixed Wing' || option === 'fixed-wing') return 'самолётная схема';
+  if (option === 'Hybrid VTOL' || option === 'hybrid-vtol') return 'гибридный вертикальный взлёт';
+  if (option === 'Multirotor' || option === 'multirotor') return 'мультиротор';
+  if (option === 'CubeSat / Satellite' || option === 'cubesat-satellite') return 'кубсат / спутник';
+  return option;
+}
+
+function orbitName(orbit: string) {
+  if (orbit === 'leo') return 'низкая околоземная';
+  if (orbit === 'sso') return 'солнечно-синхронная';
+  if (orbit === 'geo') return 'геостационарная';
+  return orbit;
+}
+
+function thermalName(value: string) {
+  if (value === 'passive') return 'пассивное терморегулирование';
+  if (value === 'active') return 'активное терморегулирование';
+  return value;
+}
+
+function riskName(value: string) {
+  if (value === 'Low') return 'низкий';
+  if (value === 'Medium') return 'средний';
+  if (value === 'High') return 'высокий';
+  return value;
 }

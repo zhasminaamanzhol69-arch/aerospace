@@ -3,6 +3,7 @@ import type { CalculatedParameters, DesignOption, MissionRequirements } from '..
 import { buildEngineeringCalculations } from '../lib/engineeringCalculator';
 import { downloadEngineeringCsv, downloadEngineeringJson, printEngineeringReport } from '../lib/engineeringExport';
 import type { EngineeringStage } from '../lib/engineeringStage';
+import { useLanguage, type Language } from '../lib/language';
 import {
   bestConfiguration,
   buildDfmItems,
@@ -11,7 +12,6 @@ import {
   buildTelemetry,
   estimateUnitCost,
 } from '../lib/stageInsights';
-import { useLanguage, type Language } from '../lib/language';
 import './StageEngineeringSuite.css';
 
 type Props = {
@@ -21,63 +21,15 @@ type Props = {
   options: DesignOption[];
 };
 
-const suiteText: Record<Language, {
-  eyebrow: string;
-  titles: Record<EngineeringStage, string>;
-  exportJson: string;
-  exportCsv: string;
-  pdf: string;
-  mass: string;
-  energy: string;
-  best: string;
-  score: string;
-  cost: string;
-  diagnostics: string;
-}> = {
-  kk: {
-    eyebrow: 'Аэроғарыштық дашборд модулі',
-    titles: { design: 'Жобалау аналитикасы', manufacturing: 'Технологиялық бақылау және құн', operations: 'Нақты уақыттағы телеметрия' },
-    exportJson: 'JSON экспорт',
-    exportCsv: 'CSV экспорт',
-    pdf: 'PDF есеп',
-    mass: 'Масса үлестірімі',
-    energy: 'Энергия балансы',
-    best: 'Үздік конфигурация',
-    score: 'Баға',
-    cost: 'Бір бұйымның болжамды құны',
-    diagnostics: 'AI диагностикасы',
-  },
-  ru: {
-    eyebrow: 'Модуль аэрокосмического дашборда',
-    titles: { design: 'Аналитика проектирования', manufacturing: 'Технологичность и стоимость', operations: 'Телеметрия в реальном времени' },
-    exportJson: 'Экспорт JSON',
-    exportCsv: 'Экспорт CSV',
-    pdf: 'PDF-отчёт',
-    mass: 'Распределение массы',
-    energy: 'Энергетический баланс',
-    best: 'Лучшая конфигурация',
-    score: 'Оценка',
-    cost: 'Оценочная стоимость единицы',
-    diagnostics: 'AI-диагностика',
-  },
-  en: {
-    eyebrow: 'Aerospace Dashboard Module',
-    titles: { design: 'Design Analytics', manufacturing: 'DFM & Cost Control', operations: 'Live Telemetry' },
-    exportJson: 'Export JSON',
-    exportCsv: 'Export CSV',
-    pdf: 'PDF Report',
-    mass: 'Mass Breakdown',
-    energy: 'Energy Balance',
-    best: 'Best configuration',
-    score: 'Score',
-    cost: 'Estimated unit cost',
-    diagnostics: 'AI diagnostics',
-  },
-};
+const suiteText = {
+  kk: { eyebrow: 'Аэроғарыштық бақылау тақтасының модулі', titles: { design: 'Жобалау аналитикасы', manufacturing: 'Өндіріс және құнды бақылау', operations: 'Тікелей телеметрия' }, mass: 'Масса құрылымы', energy: 'Энергия теңгерімі', best: 'Үздік конфигурация', score: 'Баға', cost: 'Бір дананың болжамды құны', diagnostics: 'AI диагностикасы', json: 'JSON экспорттау', csv: 'CSV экспорттау', pdf: 'PDF классика', vectorPdf: 'PDF вектор' },
+  ru: { eyebrow: 'Модуль аэрокосмической панели', titles: { design: 'Аналитика проектирования', manufacturing: 'Производство и контроль стоимости', operations: 'Телеметрия в реальном времени' }, mass: 'Распределение массы', energy: 'Энергетический баланс', best: 'Лучшая конфигурация', score: 'Оценка', cost: 'Ориентировочная стоимость единицы', diagnostics: 'Диагностика ИИ', json: 'Экспорт JSON', csv: 'Экспорт CSV', pdf: 'PDF классика', vectorPdf: 'PDF вектор' },
+  en: { eyebrow: 'Aerospace Dashboard Module', titles: { design: 'Design Analytics', manufacturing: 'DFM & Cost Control', operations: 'Live Telemetry' }, mass: 'Mass Breakdown', energy: 'Energy Balance', best: 'Best configuration', score: 'Score', cost: 'Estimated unit cost', diagnostics: 'AI diagnostics', json: 'Export JSON', csv: 'Export CSV', pdf: 'PDF Classic', vectorPdf: 'PDF Vector' },
+} satisfies Record<Language, Record<string, unknown>>;
 
 export function StageEngineeringSuite({ stage, requirements, parameters, options }: Props) {
   const { language } = useLanguage();
-  const text = suiteText[language];
+  const copy = suiteText[language];
   const calculations = useMemo(() => buildEngineeringCalculations(requirements, parameters), [requirements, parameters]);
   const mass = useMemo(() => buildMassBreakdown(requirements, parameters), [requirements, parameters]);
   const energy = useMemo(() => buildEnergyBreakdown(requirements, parameters), [requirements, parameters]);
@@ -92,60 +44,73 @@ export function StageEngineeringSuite({ stage, requirements, parameters, options
 
   return (
     <section className="card stage-suite">
-      <SuiteHeader stage={stage} text={text} />
-      {stage === 'design' && <DesignSuite mass={mass} energy={energy} options={options} text={text} />}
-      {stage === 'manufacturing' && <ManufacturingSuite items={dfmItems} cost={estimateUnitCost(requirements, parameters)} text={text} />}
-      {stage === 'operations' && <OperationsSuite telemetry={telemetry} recommendation={parameters.operationAdvice} text={text} />}
+      <SuiteHeader stage={stage} copy={copy} />
+      {stage === 'design' && <DesignSuite mass={mass} energy={energy} options={options} copy={copy} language={language} />}
+      {stage === 'manufacturing' && <ManufacturingSuite items={dfmItems} cost={estimateUnitCost(requirements, parameters)} copy={copy} language={language} />}
+      {stage === 'operations' && <OperationsSuite telemetry={telemetry} recommendation={parameters.operationAdvice} copy={copy} language={language} />}
       <div className="stage-suite__actions">
-        <button type="button" onClick={() => downloadEngineeringJson(stage, requirements, parameters, options, calculations)}>{text.exportJson}</button>
-        <button type="button" onClick={() => downloadEngineeringCsv(parameters, calculations)}>{text.exportCsv}</button>
-        <button type="button" onClick={() => printEngineeringReport(calculations)}>{text.pdf}</button>
+        <button type="button" onClick={() => downloadEngineeringJson(stage, requirements, parameters, options, calculations)}>{copy.json}</button>
+        <button type="button" onClick={() => downloadEngineeringCsv(parameters, calculations)}>{copy.csv}</button>
+        <button type="button" onClick={() => printEngineeringReport(calculations, 'classic')}>{copy.pdf}</button>
+        <button type="button" onClick={() => printEngineeringReport(calculations, 'vector')}>{copy.vectorPdf}</button>
       </div>
     </section>
   );
 }
 
-function SuiteHeader({ stage, text }: { stage: EngineeringStage; text: typeof suiteText.ru }) {
+type SuiteCopy = typeof suiteText.ru;
+
+function SuiteHeader({ stage, copy }: { stage: EngineeringStage; copy: SuiteCopy }) {
   return (
     <div>
-      <p className="eyebrow">{text.eyebrow}</p>
-      <h2>{text.titles[stage]}</h2>
+      <p className="eyebrow">{copy.eyebrow}</p>
+      <h2>{copy.titles[stage]}</h2>
     </div>
   );
 }
 
-function DesignSuite({ mass, energy, options, text }: { mass: ReturnType<typeof buildMassBreakdown>; energy: ReturnType<typeof buildEnergyBreakdown>; options: DesignOption[]; text: typeof suiteText.ru }) {
+function DesignSuite({ mass, energy, options, copy, language }: { mass: ReturnType<typeof buildMassBreakdown>; energy: ReturnType<typeof buildEnergyBreakdown>; options: DesignOption[]; copy: SuiteCopy; language: Language }) {
   const best = bestConfiguration(options);
   return (
     <>
-      <Chart title={text.mass} items={mass} />
-      <Chart title={text.energy} items={energy} />
+      <Chart title={copy.mass} items={translateChartItems(mass, language)} />
+      <Chart title={copy.energy} items={translateChartItems(energy, language)} />
       <div className="stage-suite__table">
-        {options.map((option) => <span key={option.name}>{option.name}: {option.score}% / {option.massKg}kg / {option.powerW}W / {option.risk}</span>)}
+        {options.map((option) => (
+          <span key={option.name}>
+            {designOptionName(option.name, language)}: {option.score}% / {option.massKg} {language === 'ru' ? 'кг' : 'kg'} / {option.powerW} {language === 'ru' ? 'Вт' : 'W'} / {riskName(option.risk, language)}
+          </span>
+        ))}
       </div>
-      {best && <strong className="stage-suite__note">{text.best}: {best.name} — {text.score} {best.score}%</strong>}
+      {best && <strong className="stage-suite__note">{copy.best}: {designOptionName(best.name, language)} — {copy.score} {best.score}%</strong>}
     </>
   );
 }
 
-function ManufacturingSuite({ items, cost, text }: { items: ReturnType<typeof buildDfmItems>; cost: number; text: typeof suiteText.ru }) {
+function ManufacturingSuite({ items, cost, copy, language }: { items: ReturnType<typeof buildDfmItems>; cost: number; copy: SuiteCopy; language: Language }) {
   return (
     <>
       <div className="stage-suite__table">
-        {items.map((item) => <span className={item.status === 'Warning' ? 'is-warning' : ''} key={item.label}>{item.label}: {item.status} — {item.note}</span>)}
+        {items.map((item) => (
+          <span className={item.status === 'Warning' ? 'is-warning' : ''} key={item.label}>
+            {item.label}: {statusName(item.status, language)} — {item.note}
+          </span>
+        ))}
       </div>
-      <strong className="stage-suite__note">{text.cost}: ${cost}</strong>
+      <strong className="stage-suite__note">{copy.cost}: ${cost}</strong>
     </>
   );
 }
 
-function OperationsSuite({ telemetry, recommendation, text }: { telemetry: ReturnType<typeof buildTelemetry>; recommendation: string; text: typeof suiteText.ru }) {
+function OperationsSuite({ telemetry, recommendation, copy, language }: { telemetry: ReturnType<typeof buildTelemetry>; recommendation: string; copy: SuiteCopy; language: Language }) {
   return (
     <>
       <div className="telemetry-live">
-        {Object.entries(telemetry).map(([key, value]) => <span key={key}>{key.toUpperCase()}: <strong>{value}</strong></span>)}
+        {Object.entries(telemetry).map(([key, value]) => (
+          <span key={key}>{telemetryLabel(key, language)}: <strong>{telemetryValue(key, value, language)}</strong></span>
+        ))}
       </div>
-      <strong className="stage-suite__note">{text.diagnostics}: {recommendation}</strong>
+      <strong className="stage-suite__note">{copy.diagnostics}: {operationAdviceName(recommendation, language)}</strong>
     </>
   );
 }
@@ -163,4 +128,71 @@ function Chart({ title, items }: { title: string; items: { label: string; percen
       ))}
     </div>
   );
+}
+
+function translateChartItems(items: { label: string; percent: number }[], language: Language) {
+  if (language !== 'ru') return items;
+  return items.map((item) => ({ ...item, label: chartLabel(item.label) }));
+}
+
+function chartLabel(label: string) {
+  if (label === 'Payload') return 'Полезная нагрузка';
+  if (label === 'Energy') return 'Энергия';
+  if (label === 'Propulsion') return 'Тяга';
+  if (label === 'Structure') return 'Конструкция';
+  if (label === 'Avionics') return 'Авионика';
+  if (label === 'Reserve') return 'Резерв';
+  return label;
+}
+
+function designOptionName(name: string, language: Language) {
+  if (language !== 'ru') return name;
+  if (name === 'Fixed Wing') return 'Самолётная схема';
+  if (name === 'Hybrid VTOL') return 'Гибридный вертикальный взлёт';
+  if (name === 'Multirotor') return 'Мультиротор';
+  if (name === 'CubeSat / Satellite') return 'Кубсат / спутник';
+  return name;
+}
+
+function riskName(risk: string, language: Language) {
+  if (language !== 'ru') return risk;
+  if (risk === 'Low') return 'низкий риск';
+  if (risk === 'Medium') return 'средний риск';
+  if (risk === 'High') return 'высокий риск';
+  return risk;
+}
+
+function statusName(status: string, language: Language) {
+  if (language !== 'ru') return status;
+  if (status === 'Warning') return 'предупреждение';
+  if (status === 'OK') return 'норма';
+  return status;
+}
+
+function telemetryLabel(key: string, language: Language) {
+  if (language !== 'ru') return key.toUpperCase();
+  if (key === 'altitude') return 'ВЫСОТА';
+  if (key === 'speed') return 'СКОРОСТЬ';
+  if (key === 'battery') return 'АККУМУЛЯТОР';
+  if (key === 'temperature') return 'ТЕМПЕРАТУРА';
+  if (key === 'vibration') return 'ВИБРАЦИЯ';
+  if (key === 'status') return 'СТАТУС';
+  return key.toUpperCase();
+}
+
+function telemetryValue(key: string, value: string, language: Language) {
+  if (language !== 'ru') return value;
+  if (key === 'status') return statusName(value, language);
+  return value
+    .replace('km/h', 'км/ч')
+    .replace('km', 'км')
+    .replace('m', 'м');
+}
+
+function operationAdviceName(advice: string, language: Language) {
+  if (language !== 'ru') return advice;
+  if (advice === 'reduce-load') return 'снизить нагрузку и оставить больший резерв';
+  if (advice === 'thermal-protection') return 'усилить термозащиту и проверить температурный режим';
+  if (advice === 'standard-check') return 'выполнить стандартную проверку перед продолжением';
+  return advice;
 }

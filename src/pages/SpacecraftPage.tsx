@@ -22,7 +22,7 @@ export function SpacecraftPage() {
       </div>
 
       <section className="spacecraft-hero">
-        <p className="eyebrow">CubeSat / Satellite Systems</p>
+        <p className="eyebrow">{copy.heroEyebrow}</p>
         <h1>{copy.heroTitle}</h1>
         <p>{copy.heroBody}</p>
       </section>
@@ -41,7 +41,7 @@ export function SpacecraftPage() {
       </section>
 
       <section className="card spacecraft-checklist">
-        <p className="eyebrow">Space Mission Checklist</p>
+        <p className="eyebrow">{copy.checklistEyebrow}</p>
         <h2>{copy.checklistTitle}</h2>
         <ol>
           {copy.checks.map((check) => <li key={check}>{check}</li>)}

@@ -126,3 +126,41 @@ button.small { padding: 6px 10px; font-size: 14px; }
   padding: 14px 18px;
   color: var(--ink);
 }
+
+@media (max-width: 640px) {
+  body {
+    background-size: 28px 28px, 28px 28px, auto;
+  }
+
+  .container {
+    padding: 18px 12px 40px;
+  }
+
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card {
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .card h2 {
+    font-size: 20px;
+    line-height: 1.18;
+  }
+
+  button,
+  input,
+  select {
+    font-size: 15px;
+  }
+
+  .form-row,
+  .list li {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

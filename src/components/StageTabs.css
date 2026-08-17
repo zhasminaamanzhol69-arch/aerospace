@@ -33,5 +33,18 @@
 }
 
 @media (max-width: 760px) {
-  .stage-tabs { grid-template-columns: 1fr; }
+  .stage-tabs {
+    display: flex;
+    gap: 8px;
+    margin-inline: -12px;
+    overflow-x: auto;
+    padding: 2px 12px 8px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .stage-tabs__item {
+    flex: 0 0 min(82vw, 320px);
+    min-height: 78px;
+    scroll-snap-align: start;
+  }
 }

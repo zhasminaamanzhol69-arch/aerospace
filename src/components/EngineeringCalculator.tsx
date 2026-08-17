@@ -67,7 +67,7 @@ export function EngineeringCalculator({ requirements, parameters }: Props) {
         </div>
       </div>
 
-      <div className="calculator-tabs" aria-label="Engineering calculation types">
+      <div className="calculator-tabs" aria-label={copy.tabsLabel}>
         {calculations.map((item) => (
           <button
             className={item.id === selected.id ? 'is-active' : ''}
@@ -103,13 +103,51 @@ export function EngineeringCalculator({ requirements, parameters }: Props) {
       </article>
 
       <div className="calculator-grid">
-        {calculations.map((item) => (
-          <article key={item.id}>
-            <span>{item.title}</span>
-            <strong>{item.result}</strong>
-          </article>
-        ))}
+        {calculations.map((item) => {
+          const preview = formatResultPreview(item.id, item.result);
+          return (
+            <article key={item.id}>
+              <span>{getPreviewTitle(item.id, item.title)}</span>
+              <strong>{preview.value}</strong>
+              {preview.detail && <small>{preview.detail}</small>}
+            </article>
+          );
+        })}
       </div>
     </section>
   );
+}
+
+const calculatorText: Record<Language, {
+  eyebrow: string; title: string; body: string; tabsLabel: string;
+  selected: string; formula: string; inputs: string; result: string;
+}> = {
+  kk: { eyebrow: 'Инженерлік калькулятор', title: 'Инженерлік калькулятор', body: 'Формула, бастапқы деректер, өлшем бірліктері және есептеу нәтижесі.', tabsLabel: 'Инженерлік есептеу түрлері', selected: 'Таңдалған есептеу', formula: 'Формула', inputs: 'Бастапқы деректер', result: 'Нәтиже' },
+  ru: { eyebrow: 'Инженерный калькулятор', title: 'Инженерный калькулятор', body: 'Формула, исходные данные, единицы измерения и расчётный результат.', tabsLabel: 'Виды инженерных расчётов', selected: 'Выбранный расчёт', formula: 'Формула', inputs: 'Исходные данные', result: 'Результат' },
+  en: { eyebrow: 'Engineering Calculator', title: 'Engineering calculator', body: 'Formula, input data, units, and calculation result.', tabsLabel: 'Engineering calculation types', selected: 'Selected calculation', formula: 'Formula', inputs: 'Input data', result: 'Result' },
+};
+
+function getPreviewTitle(id: string, title: string) {
+  if (id === 'stress') return 'Прочность';
+  if (id === 'mass') return 'Масса конструкции';
+  if (id === 'thermal') return 'Тепло';
+  if (id === 'consumption') return 'Энергия';
+  if (id === 'tolerance') return 'Допуск';
+  return title;
+}
+
+function formatResultPreview(id: string, result: string) {
+  if (id === 'cg') return splitPreview(result, ' от ');
+  if (id === 'aero') {
+    const [pressure = result, lift = '', drag = ''] = result.split('; ');
+    return { value: pressure.replace('напор ', ''), detail: [lift, drag].filter(Boolean).join(' / ') };
+  }
+  if (id === 'thermal') return splitPreview(result, ' тепловой');
+  if (id === 'margin') return { value: result.replace('запас ', ''), detail: 'запас прочности' };
+  return { value: result, detail: '' };
+}
+
+function splitPreview(result: string, separator: string) {
+  const [value, detail] = result.split(separator);
+  return { value, detail: detail ? `${separator.trim()} ${detail}` : '' };
 }

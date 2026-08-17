@@ -1,51 +1,55 @@
 import type { Language } from './language';
 
 export const aiReportText: Record<Language, {
-  eyebrow: string;
   title: string;
   subtitle: string;
   loading: string;
   ask: string;
   failed: string;
+  base: string;
   inputLabel: string;
   inputPlaceholder: string;
   emptyQuestion: string;
   placeholder: string;
+  risk: Record<string, string>;
 }> = {
   kk: {
-    eyebrow: 'AI инженерлік есебі',
-    title: 'Аэроғарыш инженерлік агенті',
+    title: 'Aerospace Engineering Agent',
     subtitle: 'Жобалау, өндіріс немесе пайдалану бойынша сұрақ қойыңыз',
     loading: 'AI жауап беріп жатыр…',
     ask: 'AI-дан сұрау',
     failed: 'AI-қорытындыны жасау мүмкін болмады.',
+    base: 'Қорытынды негізі',
     inputLabel: 'Инженерлік сұрақ',
     inputPlaceholder: 'Мысалы: осы миссия үшін қандай материал және тексеріс тәртібі керек?',
     emptyQuestion: 'Алдымен AI-ға сұрақ жазыңыз.',
-    placeholder: 'Дрондар, ғарыш, материалдар немесе инженерлік құжаттар туралы сұрақ қойыңыз.',
+    placeholder: 'AI таңдалған кезең бойынша қысқа инженерлік жауап береді.',
+    risk: { Low: 'Төмен', Medium: 'Орташа', High: 'Жоғары' },
   },
   ru: {
-    eyebrow: 'AI-инженерный отчёт',
-    title: 'Аэрокосмический инженерный агент',
-    subtitle: 'Задайте вопрос по проектированию, производству или эксплуатации',
+    title: 'ИИ-эксперт по авиации и космосу',
+    subtitle: 'Задайте любой вопрос об авиации, БПЛА, ракетах, спутниках, космосе и аэрокосмической инженерии',
     loading: 'AI отвечает…',
     ask: 'Спросить AI',
     failed: 'AI-отчёт не удалось сформировать.',
-    inputLabel: 'Инженерный запрос',
-    inputPlaceholder: 'Например: какой материал и порядок проверки нужны для этой миссии?',
+    base: 'Основа вывода',
+    inputLabel: 'Ваш вопрос',
+    inputPlaceholder: 'Например: как спутник держится на орбите или какой материал выбрать для крыла?',
     emptyQuestion: 'Сначала напиши вопрос для AI.',
-    placeholder: 'Спросите про дроны, космос, материалы, производство, эксплуатацию или инженерные документы.',
+    placeholder: 'ИИ отвечает на вопросы по авиации, космосу, аппаратам, полётам, производству и эксплуатации.',
+    risk: { Low: 'Low', Medium: 'Medium', High: 'High' },
   },
   en: {
-    eyebrow: 'AI Engineering Report',
     title: 'Aerospace Engineering Agent',
     subtitle: 'Ask about design, manufacturing, or operations',
     loading: 'AI is answering…',
     ask: 'Ask AI',
     failed: 'Could not generate the AI report.',
+    base: 'Report basis',
     inputLabel: 'Engineering request',
     inputPlaceholder: 'Example: which material and verification flow fit this mission?',
     emptyQuestion: 'Write a question for AI first.',
-    placeholder: 'Ask about drones, space, materials, manufacturing, operations, or engineering documents.',
+    placeholder: 'AI will answer for the selected phase with recommendation, parameters, standards, and risks.',
+    risk: { Low: 'Low', Medium: 'Medium', High: 'High' },
   },
 };

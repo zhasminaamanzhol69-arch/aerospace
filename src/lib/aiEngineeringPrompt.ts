@@ -5,8 +5,8 @@ import {
   type EngineeringStage,
 } from './engineeringStage';
 import { aiReportFormat } from './aiReportFormat';
+import { isLearningQuestion } from './fallbackLearningAnswer';
 import type { Language } from './language';
-import { isGeneralKnowledgeQuestion, isInAerospaceScope } from './questionIntent';
 
 const languageName: Record<Language, string> = {
   kk: 'казахский',
@@ -22,25 +22,15 @@ export function buildEngineeringPrompt(
   stage: EngineeringStage,
   userQuestion: string,
 ) {
-  if (!isInAerospaceScope(userQuestion)) {
+  if (isLearningQuestion(userQuestion)) {
     return [
       `Вопрос пользователя: ${userQuestion}`,
       `Язык ответа: ${languageName[language]}.`,
-      'Тип вопроса: вне тематики сайта.',
-      'Коротко откажись отвечать по этой теме.',
-      'Объясни, что Vectori отвечает только на вопросы про космос, дроны/авиацию, материалы, производство, испытания, эксплуатацию, телеметрию и инженерные документы.',
-      'Не добавляй инженерные расчёты, стандарты или длинный отчет.',
-    ].join('\n\n').trim();
-  }
-
-  const isGeneral = isGeneralKnowledgeQuestion(userQuestion);
-  if (isGeneral) {
-    return [
-      `Вопрос пользователя: ${userQuestion}`,
-      `Язык ответа: ${languageName[language]}.`,
-      'Тип вопроса: общий справочный вопрос.',
-      'Ответь кратко, простым языком, без инженерного шаблона, без MTOW/MOS/NDT, без стандартов и без расшифровки слова как аббревиатуры, если пользователь прямо не попросил инженерный смысл.',
-      'Объем: 2-4 предложения.',
+      'Это общий учебный вопрос. Ответь прямо, просто и по делу.',
+      'Не используй текущие расчёты миссии, выбранный этап, стандарты, риски и отчётную структуру, если пользователь сам об этом не просит.',
+      'Если вопрос требует определения, дай короткое определение и 1-2 понятных примера.',
+      'Если вопрос требует объяснения процесса, объясни по шагам простыми словами.',
+      'Не добавляй лишние предупреждения и нормативы без необходимости.',
     ].join('\n\n').trim();
   }
 
@@ -88,7 +78,9 @@ function buildOptionsBlock(options: DesignOption[]) {
 
 function buildGuardrails(stage: EngineeringStage, domain: MissionRequirements['vehicleDomain']) {
   return `Дополнительные правила:
-- Раскрывай только выбранный этап ${engineeringStageLabel[stage]}; другие этапы не добавляй, если пользователь прямо не попросил сравнение.
+- Сначала прямо ответь на вопрос пользователя. Выбранный этап ${engineeringStageLabel[stage]} — дополнительный контекст, а не ограничение темы.
+- Можно раскрывать любые связанные аспекты авиации, космоса и аэрокосмической инженерии, даже если они относятся к другому этапу или классу аппарата.
+- Не подставляй параметры текущей миссии в общий вопрос, если пользователь о них не спрашивал.
 - Не придумывай нормативные ссылки, коэффициенты, допустимые напряжения, допуски и параметры испытаний.
 - Для Manufacturing используй ECSS-Q-ST-70C, ISO 9001/AS9100, ГОСТ 18353, ISO 2768-m, ISO 5817, ГОСТ 14771 только когда они релевантны.
 - Для Operations используй ECSS-E-ST-10-03C, FAA Part 107, ИКАО, ГОСТ В 20.39.304, ГОСТ 23743 только когда они релевантны.

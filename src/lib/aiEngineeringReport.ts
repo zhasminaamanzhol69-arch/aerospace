@@ -1,10 +1,10 @@
 import { isSupabaseConfigured, supabase } from './supabase';
 import type { CalculatedParameters, DesignOption, MissionRequirements } from './aerospace';
 import { buildEngineeringPrompt } from './aiEngineeringPrompt';
+import { buildOutOfScopeAnswer, isAerospaceQuestion } from './aiTopicGuard';
 import type { EngineeringStage } from './engineeringStage';
 import { buildFallbackEngineeringReport } from './fallbackEngineeringReport';
 import type { Language } from './language';
-import { detectAnswerLanguage } from './questionIntent';
 
 type AiResponse = {
   text?: string;
@@ -25,17 +25,19 @@ export async function generateEngineeringReport(
   stage: EngineeringStage,
   userQuestion: string,
 ) {
-  const answerLanguage = detectAnswerLanguage(userQuestion, language);
+  if (!isAerospaceQuestion(userQuestion)) {
+    return buildOutOfScopeAnswer(language);
+  }
 
   if (!isSupabaseConfigured) {
-    return buildFallbackEngineeringReport(requirements, parameters, options, answerLanguage, stage, userQuestion);
+    return buildFallbackEngineeringReport(requirements, parameters, options, language, stage, userQuestion);
   }
 
   try {
     const { data, error } = await supabase.functions.invoke<AiResponse>('ai', {
       body: {
-        system: buildSystemPrompt(answerLanguage),
-        prompt: buildEngineeringPrompt(requirements, parameters, options, answerLanguage, stage, userQuestion),
+        system: buildSystemPrompt(language),
+        prompt: buildEngineeringPrompt(requirements, parameters, options, language, stage, userQuestion),
       },
     });
 
@@ -45,23 +47,25 @@ export async function generateEngineeringReport(
 
     return data.text;
   } catch {
-    return buildFallbackEngineeringReport(requirements, parameters, options, answerLanguage, stage, userQuestion);
+    return buildFallbackEngineeringReport(requirements, parameters, options, language, stage, userQuestion);
   }
 }
 
 function buildSystemPrompt(language: Language) {
   return [
-    'Ты Aerospace Engineering Agent: экспертный инженерный ассистент для авиации, UAV и космических аппаратов.',
-    'Работай на этапах Жобалау / Проектирование, Дайындау / Производство, Пайдалану / Эксплуатация.',
-    `Отвечай строго на одном языке: ${languageName[language]}. Не смешивай русский, казахский и английский в одном ответе без необходимости.`,
-    'Отвечай только по тематике сайта: космос, дроны/авиация, космические аппараты, материалы, производство, испытания, эксплуатация, телеметрия и инженерные документы.',
-    'Если вопрос не относится к этой тематике, коротко откажись и предложи задать вопрос по аэрокосмической инженерии.',
-    'Если вопрос общий, не инженерный, ответь коротко как справочник и не притягивай его к аббревиатурам, MTOW, MOS, Fixed Wing или стандартам.',
-    'Отвечай по выбранному этапу и вопросу пользователя; не выводи три этапа сразу без прямой просьбы.',
+    'Ты Aerospace Engineering Agent: универсальный экспертный ассистент по авиации, аэрокосмической технике и космосу.',
+    'Отвечай на любые вопросы по самолётам, вертолётам, двигателям, аэродинамике, БПЛА, ракетам, спутникам, CubeSat, космическим аппаратам, орбитам, миссиям, материалам, производству, испытаниям, эксплуатации, безопасности и истории этих областей.',
+    'Также помогай с обучением: объясняй термины, физику и инженерные принципы понятным языком, сравнивай варианты и предлагай безопасные учебные расчёты.',
+    `Отвечай на языке: ${languageName[language]}.`,
+    'Для элементарных вопросов отвечай как хороший учитель: коротко, ясно, без отчётной структуры, без лишних стандартов и без подстановки параметров текущей миссии.',
+    'Вопрос пользователя важнее выбранного в интерфейсе этапа. Используй этап и параметры миссии только тогда, когда они действительно относятся к вопросу.',
+    'Если вопрос общий, дай прямой содержательный ответ без навязывания отчёта, текущего аппарата или выбранного этапа.',
+    'Если вопрос явно не относится к авиации, космосу или смежной инженерии, вежливо предложи задать тематический вопрос.',
     'Ссылайся только на реальные нормативно-технические документы: ECSS, NASA Technical Standards, ISO, ГОСТ, FAA, ЕСКД или другие релевантные стандарты.',
     'Номера пунктов, разделов, таблиц, коэффициенты, прочность, допуски и лимиты приводи только если они есть в доступном контексте или ты точно знаешь источник.',
-    'Если точных нормативных данных нет, напиши: "В имеющихся нормативных документах нет точной информации по данному запросу."',
+    'Фразу об отсутствии точных нормативных данных используй только тогда, когда пользователь действительно спрашивает про стандарт, норму или точное числовое ограничение.',
     'Текущие Mission Requirements используй как дополнительный контекст, только если они подходят к вопросу.',
+    'Если вопрос не связан с аэрокосмической тематикой, не отвечай по содержанию вопроса; официально сообщи, что система отвечает только на вопросы по авиации, космосу и аэрокосмической инженерии.',
     'Не обещай реальную сертификацию и не выдавай учебные расчёты за готовый промышленный проект.',
   ].join(' ');
 }

@@ -6,25 +6,81 @@
 
 .calculated-grid {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  align-content: stretch;
+  flex: 1;
+  gap: 10px;
+  grid-template-columns: 1fr;
+}
+
+.calculated-grid--design {
+  grid-template-columns: 1fr;
 }
 
 .calculated-metric {
-  background: rgba(7, 17, 31, 0.5);
-  border: 1px solid rgba(56, 189, 248, 0.18);
+  align-items: center;
+  background: rgba(7, 17, 31, 0.42);
+  border: 1px solid rgba(56, 189, 248, 0.14);
   border-radius: 8px;
-  padding: 14px;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  min-height: 0;
+  padding: 12px 14px;
 }
 
 .calculated-metric span {
   color: var(--soft);
   display: block;
   font-size: 13px;
-  margin-bottom: 8px;
+  line-height: 1.25;
+  margin: 0;
+  min-width: 0;
 }
 
 .calculated-metric strong {
-  color: var(--accent);
+  color: #67d8ff;
+  flex: 0 0 auto;
   font-size: 18px;
+  line-height: 1.15;
+  max-width: 48%;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  .calculated-panel {
+    gap: 14px;
+  }
+
+  .calculated-grid {
+    gap: 8px;
+  }
+
+  .calculated-metric {
+    border-radius: 12px;
+    gap: 10px;
+    min-height: 54px;
+    padding: 11px 12px;
+  }
+
+  .calculated-metric span {
+    font-size: 12px;
+  }
+
+  .calculated-metric strong {
+    font-size: 17px;
+    max-width: 54%;
+  }
+}
+
+@media (max-width: 420px) {
+  .calculated-metric {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .calculated-metric strong {
+    max-width: 100%;
+    text-align: left;
+  }
 }

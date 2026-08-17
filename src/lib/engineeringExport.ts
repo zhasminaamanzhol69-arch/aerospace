@@ -1,6 +1,7 @@
 import type { CalculatedParameters, DesignOption, MissionRequirements } from './aerospace';
 import type { CalculatorResult } from './engineeringCalculator';
 import type { EngineeringStage } from './engineeringStage';
+import { getPdfThemeAssets, type PdfTheme } from './engineeringReportThemes';
 
 export function downloadEngineeringJson(
   stage: EngineeringStage,
@@ -23,19 +24,43 @@ export function downloadEngineeringCsv(parameters: CalculatedParameters, calcula
   downloadFile('vectori-engineering-report.csv', csv, 'text/csv');
 }
 
-export function printEngineeringReport(calculations: CalculatorResult[]) {
+export function printEngineeringReport(calculations: CalculatorResult[], theme: PdfTheme = 'classic') {
+  const themeAssets = getPdfThemeAssets(theme);
   const formulas = calculations
-    .map((item) => `<li><strong>${item.title}</strong><br>${item.formula}<br>${item.result}</li>`)
+    .map((item, index) => `
+      <article class="formula-card">
+        <span>${String(index + 1).padStart(2, '0')}</span>
+        <div>
+          <h2>${item.title}</h2>
+          <p class="formula">${item.formula}</p>
+          <p class="result">${item.result}</p>
+        </div>
+      </article>
+    `)
     .join('');
   const popup = window.open('', 'vectori-report', 'width=960,height=720');
   if (!popup) return;
   popup.document.write(`
     <html>
-      <head><title>Vectori Engineering Report</title></head>
-      <body style="font-family: Inter, Arial, sans-serif; padding: 32px; color: #0f172a;">
-        <h1>Vectori Engineering Report</h1>
-        <p>Формулы, исходные данные и расчетные результаты для CAD/CAE проверки.</p>
-        <ol>${formulas}</ol>
+      <head>
+        <title>Vectori Engineering Report</title>
+        <style>${themeAssets.css}</style>
+      </head>
+      <body>
+        ${themeAssets.svg}
+        <main>
+          <header>
+            <p class="eyebrow">${themeAssets.label}</p>
+            <h1>Vectori Engineering Report</h1>
+            <p class="lead">Формулы, исходные данные и расчётные результаты для CAD/CAE проверки.</p>
+          </header>
+          <section class="summary-grid">
+            <div><span>Формат</span><strong>PDF</strong></div>
+            <div><span>Раздел</span><strong>Аналитика</strong></div>
+            <div><span>Тип</span><strong>Инженерный расчёт</strong></div>
+          </section>
+          <section class="formula-list">${formulas}</section>
+        </main>
       </body>
     </html>
   `);

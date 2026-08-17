@@ -32,5 +32,12 @@
 }
 
 @media (max-width: 720px) {
-  .domain-tabs__grid { grid-template-columns: 1fr; }
+  .domain-tabs__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .domain-tabs button {
+    min-height: 68px;
+    padding: 12px;
+  }
 }
