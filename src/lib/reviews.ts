@@ -29,10 +29,12 @@ export async function loadReviews() {
 
 export async function addReview(rating: number, comment: string) {
   if (!isSupabaseConfigured) return 'not-configured';
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData.user) return 'not-authenticated';
 
   const { error } = await supabase
     .from('reviews')
-    .insert({ rating, comment: comment.trim() });
+    .insert({ rating, comment: comment.trim(), user_id: userData.user.id });
 
   return error?.message ?? '';
 }

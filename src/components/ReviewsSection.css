@@ -57,6 +57,13 @@
   font-size: 14px;
 }
 
+.reviews-section__guest {
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 8px;
+  padding: 14px;
+}
+
 .reviews-section__list {
   display: grid;
   gap: 10px;

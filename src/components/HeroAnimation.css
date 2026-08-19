@@ -1,0 +1,366 @@
+.hero-animation {
+  background:
+    radial-gradient(circle at 78% 24%, rgba(251, 191, 36, 0.2), transparent 18%),
+    radial-gradient(circle at 22% 72%, rgba(34, 197, 94, 0.18), transparent 22%),
+    linear-gradient(145deg, #07111f 0%, #0f2940 54%, #12384d 100%);
+  height: 100%;
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  z-index: 2;
+}
+
+.hero-animation--flight::after {
+  background:
+    linear-gradient(160deg, transparent 0 42%, rgba(34, 197, 94, 0.18) 43%, rgba(14, 116, 144, 0.24) 58%, transparent 59%),
+    linear-gradient(180deg, transparent 0 72%, rgba(15, 23, 42, 0.88) 73%);
+  bottom: 0;
+  content: '';
+  height: 42%;
+  inset-inline: 0;
+  position: absolute;
+  z-index: 0;
+}
+
+.hero-animation--space {
+  background:
+    radial-gradient(circle at 28% 70%, rgba(56, 189, 248, 0.24), transparent 24%),
+    radial-gradient(circle at 78% 18%, rgba(248, 250, 252, 0.14), transparent 16%),
+    linear-gradient(145deg, #050816 0%, #0b1730 52%, #12314d 100%);
+}
+
+.hero-animation__sound {
+  align-items: center;
+  background: rgba(7, 17, 31, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 999px;
+  bottom: 16px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  color: #e0f2fe;
+  cursor: pointer;
+  display: flex;
+  font-size: 18px;
+  font-weight: 900;
+  height: 38px;
+  justify-content: center;
+  position: absolute;
+  left: 16px;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  width: 38px;
+  z-index: 4;
+}
+
+.hero-animation__sound:hover,
+.hero-animation__sound:focus-visible {
+  border-color: rgba(56, 189, 248, 0.78);
+  transform: translateY(-1px);
+}
+
+.hero-animation__sound.is-active {
+  background: rgba(34, 197, 94, 0.18);
+  border-color: rgba(34, 197, 94, 0.72);
+  color: #86efac;
+}
+
+.hero-animation__grid,
+.hero-animation__route,
+.hero-animation__route--second {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.hero-animation__grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.11) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent);
+  opacity: 0.42;
+  transform: perspective(460px) rotateX(58deg) translateY(18%);
+}
+
+.hero-animation__route {
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-left: 0;
+  border-radius: 50%;
+  height: 58%;
+  left: 8%;
+  top: 21%;
+  transform: rotate(-12deg);
+  width: 84%;
+}
+
+.hero-animation__route--second {
+  border-color: rgba(34, 197, 94, 0.18);
+  height: 38%;
+  left: 20%;
+  top: 32%;
+  transform: rotate(18deg);
+  width: 62%;
+}
+
+.hero-animation__sun {
+  animation: glowBeat 3.8s ease-in-out infinite;
+  background: radial-gradient(circle, #fde68a, #f59e0b 56%, transparent 62%);
+  height: 92px;
+  position: absolute;
+  right: 11%;
+  top: 13%;
+  width: 92px;
+}
+
+.hero-animation__cloud {
+  animation: cloudDrift 12s linear infinite;
+  background: rgba(226, 232, 240, 0.18);
+  border-radius: 999px;
+  height: 16px;
+  position: absolute;
+  width: 120px;
+  z-index: 1;
+}
+
+.hero-animation__cloud::before,
+.hero-animation__cloud::after {
+  background: inherit;
+  border-radius: inherit;
+  content: '';
+  height: 100%;
+  position: absolute;
+  top: -8px;
+  width: 54px;
+}
+
+.hero-animation__cloud::before { left: 18px; }
+.hero-animation__cloud::after { right: 20px; }
+.hero-animation__cloud--one { left: -24%; top: 27%; }
+.hero-animation__cloud--two {
+  animation-delay: -5s;
+  left: -18%;
+  opacity: 0.65;
+  top: 63%;
+}
+
+.hero-animation__aircraft {
+  animation: aircraftLoop 6.8s ease-in-out infinite;
+  height: 84px;
+  left: 6%;
+  position: absolute;
+  top: 60%;
+  transform-style: preserve-3d;
+  width: 164px;
+  z-index: 2;
+}
+
+.hero-animation__aircraft::before {
+  background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.44), transparent);
+  border-radius: 999px;
+  content: '';
+  height: 5px;
+  left: -132px;
+  position: absolute;
+  top: 40px;
+  transform: rotate(2deg);
+  width: 128px;
+}
+
+.hero-animation__aircraft-body,
+.hero-animation__wing,
+.hero-animation__tail {
+  background: linear-gradient(90deg, #e0f2fe, #38bdf8);
+  position: absolute;
+}
+
+.hero-animation__aircraft-body {
+  border-radius: 999px 18px 18px 999px;
+  height: 22px;
+  left: 0;
+  top: 31px;
+  width: 164px;
+}
+
+.hero-animation__wing {
+  border-radius: 8px;
+  height: 18px;
+  left: 62px;
+  width: 66px;
+}
+
+.hero-animation__wing--top {
+  top: 14px;
+  transform: skewX(-26deg);
+}
+
+.hero-animation__wing--bottom {
+  bottom: 13px;
+  transform: skewX(26deg);
+}
+
+.hero-animation__tail {
+  border-radius: 8px;
+  height: 42px;
+  left: 10px;
+  top: 4px;
+  transform: skewX(26deg);
+  width: 22px;
+}
+
+.hero-animation__planet {
+  animation: planetTurn 12s linear infinite;
+  background:
+    radial-gradient(circle at 42% 38%, rgba(34, 197, 94, 0.7), transparent 10%),
+    radial-gradient(circle at 62% 68%, rgba(14, 165, 233, 0.8), transparent 15%),
+    linear-gradient(135deg, #38bdf8, #0f766e 62%, #14532d);
+  border-radius: 50%;
+  box-shadow: inset -26px -22px 42px rgba(7, 17, 31, 0.48), 0 0 54px rgba(56, 189, 248, 0.28);
+  height: 142px;
+  left: 18%;
+  position: absolute;
+  top: 45%;
+  width: 142px;
+}
+
+.hero-animation__orbit {
+  animation: orbitTurn 7.8s linear infinite;
+  border: 1px solid rgba(56, 189, 248, 0.38);
+  border-radius: 50%;
+  height: 190px;
+  left: 14%;
+  position: absolute;
+  top: 35%;
+  transform: rotate(-22deg);
+  width: 230px;
+}
+
+.hero-animation__orbit--two {
+  animation-duration: 10.2s;
+  border-color: rgba(34, 197, 94, 0.24);
+  height: 244px;
+  left: 7%;
+  top: 27%;
+  width: 310px;
+}
+
+.hero-animation__satellite {
+  animation: satelliteArc 6.4s ease-in-out infinite;
+  height: 78px;
+  left: 58%;
+  position: absolute;
+  top: 31%;
+  width: 138px;
+  z-index: 3;
+}
+
+.hero-animation__satellite-core,
+.hero-animation__panel {
+  position: absolute;
+}
+
+.hero-animation__satellite-core {
+  background: linear-gradient(145deg, #f8fafc, #94a3b8);
+  border-radius: 8px;
+  height: 34px;
+  left: 52px;
+  top: 22px;
+  width: 34px;
+}
+
+.hero-animation__panel {
+  background: linear-gradient(135deg, #0284c7, #67e8f9);
+  border: 1px solid rgba(248, 250, 252, 0.42);
+  height: 24px;
+  top: 27px;
+  width: 46px;
+}
+
+.hero-animation__panel--left { left: 0; }
+.hero-animation__panel--right { right: 0; }
+
+.hero-animation__star {
+  animation: glowBeat 2.6s ease-in-out infinite;
+  background: #f8fafc;
+  border-radius: 50%;
+  height: 5px;
+  position: absolute;
+  width: 5px;
+}
+
+.hero-animation__star--one { right: 22%; top: 22%; }
+.hero-animation__star--two {
+  animation-delay: 1s;
+  right: 14%;
+  top: 58%;
+}
+
+@keyframes aircraftLoop {
+  0% {
+    opacity: 0;
+    transform: translate3d(-46%, 34%, 0) rotate(-12deg) scale(0.78);
+  }
+  14% {
+    opacity: 1;
+  }
+  46% {
+    transform: translate3d(128%, -112%, 0) rotate(3deg) scale(1.05);
+  }
+  74% {
+    opacity: 1;
+    transform: translate3d(238%, -48%, 0) rotate(-4deg) scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(326%, -8%, 0) rotate(-7deg) scale(0.72);
+  }
+}
+
+@keyframes satelliteArc {
+  0%, 100% { transform: translate3d(-22px, 28px, 0) rotate(-16deg); }
+  50% { transform: translate3d(26px, -18px, 0) rotate(12deg); }
+}
+
+@keyframes cloudDrift {
+  from { transform: translateX(0); }
+  to { transform: translateX(150vw); }
+}
+
+@keyframes orbitTurn {
+  from { transform: rotate(-22deg); }
+  to { transform: rotate(338deg); }
+}
+
+@keyframes planetTurn {
+  0%, 100% { filter: hue-rotate(0deg); transform: rotate(0deg); }
+  50% { filter: hue-rotate(18deg); transform: rotate(5deg); }
+}
+
+@keyframes glowBeat {
+  0%, 100% { opacity: 0.72; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@media (max-width: 760px) {
+  .hero-animation__aircraft {
+    left: 35%;
+    top: 42%;
+    transform: scale(0.82);
+  }
+
+  .hero-animation__planet {
+    height: 116px;
+    width: 116px;
+  }
+
+  .hero-animation__satellite {
+    left: 48%;
+    top: 28%;
+    transform: scale(0.86);
+  }
+
+  .hero-animation__sound {
+    bottom: 12px;
+    height: 34px;
+    left: 12px;
+    width: 34px;
+  }
+}

@@ -28,7 +28,7 @@ const text: Record<Language, {
   },
   en: {
     eyebrow: 'Calculated Parameters',
-    titles: { design: 'Design analysis', manufacturing: 'MANUFACTURING & MATERIALS ANALYSIS / ДАЙЫНДАУ ЖӘНЕ МАТЕРИАЛДАР', operations: 'Operations analysis' },
+    titles: { design: 'Design analysis', manufacturing: 'Manufacturing and materials analysis', operations: 'Operations analysis' },
     risk: { Low: 'Low', Medium: 'Medium', High: 'High' },
   },
 };
@@ -66,12 +66,23 @@ function buildStageMetrics(
   if (stage === 'design') return buildDesignMetrics(parameters, requirements, risk, language);
 
   if (stage === 'manufacturing') {
+    if (language === 'kk') {
+      return [
+        { label: 'Өндіріс күрделілігі', value: `${complexityName(parameters.manufacturingComplexityPercent, language)} / ${parameters.manufacturingComplexityPercent}%` },
+        { label: 'Дәлдік / ISO 2768-m рұқсаты', value: `±${parameters.manufacturingToleranceMm} мм` },
+        { label: 'Дайындау уақыты', value: `${parameters.leadTimeHours} сағ / бөлшек` },
+        { label: 'Дефектоскопия', value: ndtName(parameters.ndtMethod, language) },
+        { label: 'Материал бағыты', value: materialName(requirements.material, language) },
+        { label: 'Процесс тәуекелі', value: risk[parameters.riskLevel] },
+      ];
+    }
+
     if (language === 'ru') {
       return [
         { label: 'Сложность производства', value: `${complexityName(parameters.manufacturingComplexityPercent, language)} / ${parameters.manufacturingComplexityPercent}%` },
         { label: 'Точность / допуск ISO 2768-m', value: `±${parameters.manufacturingToleranceMm} мм` },
         { label: 'Срок изготовления', value: `${parameters.leadTimeHours} ч / деталь` },
-        { label: 'Дефектоскопия', value: parameters.ndtMethod },
+        { label: 'Дефектоскопия', value: ndtName(parameters.ndtMethod, language) },
         { label: 'Маршрут материала', value: materialName(requirements.material, language) },
         { label: 'Производственный риск', value: risk[parameters.riskLevel] },
       ];
@@ -81,7 +92,7 @@ function buildStageMetrics(
       { label: 'Manufacturing Complexity', value: `${complexityName(parameters.manufacturingComplexityPercent, language)} / ${parameters.manufacturingComplexityPercent}%` },
       { label: 'Precision / Tolerance ISO 2768-m', value: `±${parameters.manufacturingToleranceMm} mm` },
       { label: 'Lead Time', value: `${parameters.leadTimeHours} h / part` },
-      { label: 'NDT / Дефектоскопия', value: parameters.ndtMethod },
+      { label: 'NDT', value: ndtName(parameters.ndtMethod, language) },
       { label: 'Material route', value: materialName(requirements.material, language) },
       { label: 'Process risk', value: risk[parameters.riskLevel] },
     ];
@@ -100,6 +111,17 @@ function buildStageMetrics(
         ];
       }
 
+      if (language === 'kk') {
+        return [
+          { label: 'Энергия теңгерімі', value: `күн панелі ${requirements.solarArrayW} Вт / жүктеме ${requirements.payloadPowerW} Вт` },
+          { label: 'Вакуумдағы жылу режимі', value: `${thermalName(requirements.thermalControl, language)} / борттық компьютер ${parameters.onboardComputerTempC}°C` },
+          { label: 'Орбита және байланыс сапасы', value: `${orbitName(requirements.orbitClass, language)} / ${parameters.linkQualityPercent}%` },
+          { label: 'Радиация қоры', value: `${requirements.radiationToleranceKrad} крад / кідіріс ${requirements.telemetryLatencyMs} мс` },
+          { label: 'Қалған ресурс', value: `${parameters.serviceLifeHours} орбиталық сағ` },
+          { label: 'Ақау статусы', value: `${statusName(parameters.anomalyStatus, language)} / ${risk[parameters.riskLevel]}` },
+        ];
+      }
+
       return [
         { label: 'Power Balance', value: `Solar ${requirements.solarArrayW} W / load ${requirements.payloadPowerW} W` },
         { label: 'Thermal Vacuum Mode', value: `${requirements.thermalControl} / OBC ${parameters.onboardComputerTempC}°C` },
@@ -111,12 +133,12 @@ function buildStageMetrics(
     }
 
     return [
-      { label: language === 'ru' ? 'Состояние аккумулятора и резерв' : 'Battery Health & Reserve', value: language === 'ru' ? `${requirements.batterySohPercent}% / аварийный возврат ${parameters.emergencyReservePercent}%` : `SoH ${requirements.batterySohPercent}% / RTH ${parameters.emergencyReservePercent}%` },
-      { label: language === 'ru' ? 'Тепловой режим' : 'Thermal mode', value: language === 'ru' ? `двигатель ${requirements.motorTempC}°C / бортовой компьютер ${parameters.onboardComputerTempC}°C` : `Motor ${requirements.motorTempC}°C / OBC ${parameters.onboardComputerTempC}°C` },
-      { label: language === 'ru' ? 'Качество связи' : 'Link Quality', value: `${parameters.linkQualityPercent}% / GPS ${requirements.satelliteCount}` },
-      { label: language === 'ru' ? 'Задержка телеметрии' : 'Telemetry latency', value: language === 'ru' ? `${requirements.telemetryLatencyMs} мс / сигнал ${requirements.linkRssiDbm} dBm` : `${requirements.telemetryLatencyMs} ms / RSSI ${requirements.linkRssiDbm} dBm` },
-      { label: language === 'ru' ? 'Остаточный ресурс' : 'MTBF / Service Life', value: language === 'ru' ? `${parameters.serviceLifeHours} лётных ч` : `${parameters.serviceLifeHours} flight h` },
-      { label: language === 'ru' ? 'Статус аномалий' : 'Anomaly Status', value: `${statusName(parameters.anomalyStatus, language)} / ${risk[parameters.riskLevel]}` },
+      { label: operationLabel('battery', language), value: operationValue('battery', requirements, parameters, language) },
+      { label: operationLabel('thermal', language), value: operationValue('thermal', requirements, parameters, language) },
+      { label: operationLabel('link', language), value: `${parameters.linkQualityPercent}% / GPS ${requirements.satelliteCount}` },
+      { label: operationLabel('latency', language), value: operationValue('latency', requirements, parameters, language) },
+      { label: operationLabel('life', language), value: operationValue('life', requirements, parameters, language) },
+      { label: operationLabel('status', language), value: `${statusName(parameters.anomalyStatus, language)} / ${risk[parameters.riskLevel]}` },
     ];
   }
 
@@ -130,12 +152,25 @@ function buildDesignMetrics(
   language: Language,
 ) {
   if (requirements.vehicleDomain === 'spacecraft') {
+    if (language === 'kk') {
+      return [
+        { label: 'Орбита класы', value: orbitName(requirements.orbitClass, language) },
+        { label: 'Пайдалы жүк қуаты', value: `${requirements.payloadPowerW} Вт` },
+        { label: 'Күн панельдері', value: `${requirements.solarArrayW} Вт` },
+        { label: 'Термореттеу', value: thermalName(requirements.thermalControl, language) },
+        { label: 'Радиацияға төзімділік', value: `${requirements.radiationToleranceKrad} крад` },
+        { label: 'Энергия қоры', value: `${parameters.requiredEnergyWh} Вт·сағ` },
+        { label: 'Іске қосу жүктемесі қоры', value: `${parameters.marginOfSafety} / ${parameters.loadFactorG}g` },
+        { label: 'Миссия тәуекелі', value: risk[parameters.riskLevel] },
+      ];
+    }
+
     if (language === 'ru') {
       return [
-        { label: 'Класс орбиты', value: orbitName(requirements.orbitClass) },
+        { label: 'Класс орбиты', value: orbitName(requirements.orbitClass, language) },
         { label: 'Мощность полезной нагрузки', value: `${requirements.payloadPowerW} Вт` },
         { label: 'Солнечные панели', value: `${requirements.solarArrayW} Вт` },
-        { label: 'Терморегулирование', value: thermalName(requirements.thermalControl) },
+        { label: 'Терморегулирование', value: thermalName(requirements.thermalControl, language) },
         { label: 'Радиационная стойкость', value: `${requirements.radiationToleranceKrad} крад` },
         { label: 'Запас энергии', value: `${parameters.requiredEnergyWh} Вт·ч` },
         { label: 'Запас по пусковой нагрузке', value: `${parameters.marginOfSafety} / ${parameters.loadFactorG}g` },
@@ -157,24 +192,31 @@ function buildDesignMetrics(
 
   const labels = {
     ru: ['Расчётная взлётная масса', 'Средняя мощность', 'Пиковая мощность', 'Ёмкость батарей', 'Площадь крыла', 'Размах крыла', 'Аэродинамическое качество', 'Нагрузка, Н/м²', 'Запас прочности'],
-    kk: ['Есептік MTOW', 'Орташа қуат', 'Пик қуат', 'Батарея сыйымдылығы', 'Қанат ауданы S', 'Қанат құлашы b', 'L/D', 'Жүктеме N/m²', 'Беріктік қоры'],
+    kk: ['Есептік ұшу массасы', 'Орташа қуат', 'Пик қуат', 'Батарея сыйымдылығы', 'Қанат ауданы', 'Қанат құлашы', 'Аэродинамикалық сапа', 'Жүктеме, Н/м²', 'Беріктік қоры'],
     en: ['Estimated MTOW', 'Average power', 'Peak power', 'Battery capacity', 'Wing area S', 'Wing span b', 'L/D', 'Loading N/m²', 'Margin of Safety'],
   }[language];
 
   return [
-    { label: labels[0], value: language === 'ru' ? `${parameters.estimatedTakeoffMassKg} кг` : `${parameters.estimatedTakeoffMassKg} kg` },
-    { label: labels[1], value: language === 'ru' ? `${parameters.averagePowerW} Вт` : `${parameters.averagePowerW} W` },
-    { label: labels[2], value: language === 'ru' ? `${parameters.peakPowerW} Вт` : `${parameters.peakPowerW} W` },
-    { label: labels[3], value: language === 'ru' ? `${parameters.requiredEnergyWh} Вт·ч` : `${parameters.requiredEnergyWh} Wh` },
+    { label: labels[0], value: language !== 'en' ? `${parameters.estimatedTakeoffMassKg} кг` : `${parameters.estimatedTakeoffMassKg} kg` },
+    { label: labels[1], value: language !== 'en' ? `${parameters.averagePowerW} Вт` : `${parameters.averagePowerW} W` },
+    { label: labels[2], value: language !== 'en' ? `${parameters.peakPowerW} Вт` : `${parameters.peakPowerW} W` },
+    { label: labels[3], value: language !== 'en' ? `${parameters.requiredEnergyWh} Вт·ч` : `${parameters.requiredEnergyWh} Wh` },
     { label: labels[4], value: `${parameters.wingAreaM2} m²` },
     { label: labels[5], value: `${parameters.wingSpanM} m` },
     { label: labels[6], value: `${parameters.liftToDrag}` },
-    { label: labels[7], value: language === 'ru' ? `${parameters.wingOrDiskLoading} Н/м²` : `${parameters.wingOrDiskLoading} N/m²` },
-    { label: labels[8], value: language === 'ru' ? `${parameters.marginOfSafety} / ${parameters.loadFactorG}g · ${risk[parameters.riskLevel]}` : `${parameters.marginOfSafety} / ny=${parameters.loadFactorG}g (${risk[parameters.riskLevel]})` },
+    { label: labels[7], value: language !== 'en' ? `${parameters.wingOrDiskLoading} Н/м²` : `${parameters.wingOrDiskLoading} N/m²` },
+    { label: labels[8], value: language !== 'en' ? `${parameters.marginOfSafety} / ${parameters.loadFactorG}g · ${risk[parameters.riskLevel]}` : `${parameters.marginOfSafety} / ny=${parameters.loadFactorG}g (${risk[parameters.riskLevel]})` },
   ];
 }
 
 function materialName(material: string, language: Language) {
+  if (language === 'kk') {
+    if (material === 'aluminum-2024') return 'Алюминий-литий 2024';
+    if (material === 'aluminum-7075') return 'Алюминий 7075-Т6';
+    if (material === 'dmls-metal') return 'лазерлік балқыту металы';
+    if (material === 'carbon') return 'көмірпластик';
+    if (material === 'titanium') return 'титан';
+  }
   if (language === 'ru') {
     if (material === 'aluminum-2024') return 'Алюминий-литиевый сплав 2024';
     if (material === 'aluminum-7075') return 'Алюминий 7075-Т6';
@@ -191,6 +233,11 @@ function materialName(material: string, language: Language) {
 }
 
 function complexityName(value: number, language: Language) {
+  if (language === 'kk') {
+    if (value >= 78) return 'Жоғары';
+    if (value >= 55) return 'Орташа';
+    return 'Төмен';
+  }
   if (language === 'ru') {
     if (value >= 78) return 'Высокая';
     if (value >= 55) return 'Средняя';
@@ -201,22 +248,68 @@ function complexityName(value: number, language: Language) {
   return 'Low';
 }
 
-function thermalName(value: string) {
-  if (value === 'passive') return 'пассивное терморегулирование';
-  if (value === 'active') return 'активное терморегулирование';
+function ndtName(value: string, language: Language) {
+  if (value === 'Ultrasound C-Scan') {
+    if (language === 'kk') return 'ультрадыбыстық C-Scan';
+    if (language === 'ru') return 'ультразвуковой C-Scan';
+  }
   return value;
 }
 
-function orbitName(value: string) {
-  if (value === 'leo') return 'низкая околоземная орбита';
-  if (value === 'sso') return 'солнечно-синхронная орбита';
-  if (value === 'geo') return 'геостационарная орбита';
+function thermalName(value: string, language: Language = 'ru') {
+  if (value === 'passive') return language === 'kk' ? 'пассивті термореттеу' : 'пассивное терморегулирование';
+  if (value === 'active') return language === 'kk' ? 'активті термореттеу' : 'активное терморегулирование';
+  return value;
+}
+
+function orbitName(value: string, language: Language = 'ru') {
+  if (value === 'leo') return language === 'kk' ? 'төмен Жер орбитасы' : 'низкая околоземная орбита';
+  if (value === 'sso') return language === 'kk' ? 'күн-синхронды орбита' : 'солнечно-синхронная орбита';
+  if (value === 'geo') return language === 'kk' ? 'геостационарлық орбита' : 'геостационарная орбита';
   return value;
 }
 
 function statusName(value: string, language: Language) {
+  if (language === 'kk') {
+    if (value === 'OK') return 'норма';
+    if (value === 'Warning') return 'ескерту';
+    return value;
+  }
   if (language !== 'ru') return value;
   if (value === 'OK') return 'норма';
   if (value === 'Warning') return 'предупреждение';
   return value;
+}
+
+function operationLabel(key: string, language: Language) {
+  const labels = {
+    kk: { battery: 'Аккумулятор күйі және резерв', thermal: 'Жылу режимі', link: 'Байланыс сапасы', latency: 'Телеметрия кідірісі', life: 'Қалған ресурс', status: 'Ақау статусы' },
+    ru: { battery: 'Состояние аккумулятора и резерв', thermal: 'Тепловой режим', link: 'Качество связи', latency: 'Задержка телеметрии', life: 'Остаточный ресурс', status: 'Статус аномалий' },
+    en: { battery: 'Battery Health & Reserve', thermal: 'Thermal mode', link: 'Link Quality', latency: 'Telemetry latency', life: 'MTBF / Service Life', status: 'Anomaly Status' },
+  }[language];
+  return labels[key as keyof typeof labels];
+}
+
+function operationValue(key: string, requirements: MissionRequirements, parameters: CalculatedParameters, language: Language) {
+  if (key === 'battery') {
+    if (language === 'kk') return `${requirements.batterySohPercent}% / авариялық қайту ${parameters.emergencyReservePercent}%`;
+    if (language === 'ru') return `${requirements.batterySohPercent}% / аварийный возврат ${parameters.emergencyReservePercent}%`;
+    return `SoH ${requirements.batterySohPercent}% / RTH ${parameters.emergencyReservePercent}%`;
+  }
+  if (key === 'thermal') {
+    if (language === 'kk') return `қозғалтқыш ${requirements.motorTempC}°C / борттық компьютер ${parameters.onboardComputerTempC}°C`;
+    if (language === 'ru') return `двигатель ${requirements.motorTempC}°C / бортовой компьютер ${parameters.onboardComputerTempC}°C`;
+    return `Motor ${requirements.motorTempC}°C / OBC ${parameters.onboardComputerTempC}°C`;
+  }
+  if (key === 'latency') {
+    if (language === 'kk') return `${requirements.telemetryLatencyMs} мс / сигнал ${requirements.linkRssiDbm} dBm`;
+    if (language === 'ru') return `${requirements.telemetryLatencyMs} мс / сигнал ${requirements.linkRssiDbm} dBm`;
+    return `${requirements.telemetryLatencyMs} ms / RSSI ${requirements.linkRssiDbm} dBm`;
+  }
+  if (key === 'life') {
+    if (language === 'kk') return `${parameters.serviceLifeHours} ұшу сағ`;
+    if (language === 'ru') return `${parameters.serviceLifeHours} лётных ч`;
+    return `${parameters.serviceLifeHours} flight h`;
+  }
+  return '';
 }

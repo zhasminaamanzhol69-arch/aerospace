@@ -20,7 +20,7 @@ export function EngineeringCalculator({ requirements, parameters }: Props) {
   const selected = calculations.find((item) => item.id === selectedId) ?? calculations[0];
 
   return (
-    <section className="card engineering-calculator">
+    <section className="card engineering-calculator" id="engineering-calculator">
       <div className="calculator-header">
         <div>
           <p className="eyebrow">{copy.eyebrow}</p>

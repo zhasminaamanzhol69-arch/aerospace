@@ -1,50 +1,59 @@
 .stage-tabs {
+  border-left: 1px solid rgba(30, 58, 82, 0.92);
   display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  max-width: none;
 }
 
 .stage-tabs__item {
-  background: rgba(7, 17, 31, 0.64);
-  border: 1px solid rgba(30, 58, 82, 0.92);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(30, 58, 82, 0.82);
+  border-radius: 0;
   color: var(--ink);
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  min-height: 84px;
-  padding: 14px;
+  gap: 3px;
+  min-height: 58px;
+  min-width: 0;
+  padding: 10px 14px;
   text-align: left;
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .stage-tabs__item span {
+  font-size: 16px;
   font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .stage-tabs__item small {
   color: var(--soft);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .stage-tabs__item.is-active {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--glow);
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.16), transparent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.stage-tabs__item:hover {
+  background: rgba(56, 189, 248, 0.07);
 }
 
 @media (max-width: 760px) {
   .stage-tabs {
-    display: flex;
-    gap: 8px;
-    margin-inline: -12px;
-    overflow-x: auto;
-    padding: 2px 12px 8px;
-    scroll-snap-type: x mandatory;
+    max-width: none;
   }
 
   .stage-tabs__item {
-    flex: 0 0 min(82vw, 320px);
-    min-height: 78px;
-    scroll-snap-align: start;
+    min-height: 58px;
   }
 }

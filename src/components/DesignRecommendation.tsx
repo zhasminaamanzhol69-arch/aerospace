@@ -22,8 +22,8 @@ const text: Record<Language, {
     labels: ['Балл', 'Масса', 'Қуат', 'Тәуекел'],
     risk: { Low: 'Төмен', Medium: 'Орташа', High: 'Жоғары' },
     summaries: { Multirotor: 'Тік ұшу, дәл қону және прототипті сынау үшін қолайлы.', 'Fixed Wing': 'Қашықтық пен ұзақ ұшу үшін ең энергия тиімді нұсқа.', 'Hybrid VTOL': 'Тік старт пен үнемді маршруттық ұшудың теңгерімі.', 'CubeSat / Satellite': 'Орбиталық жүктеме және шағын габарит үшін қолайлы.' },
-    stageSummaries: { design: 'Аэродинамика, беріктік, қуат және схема таңдауы бойынша талдау.', manufacturing: 'Материал, қосылыс, өндіріс сериясы және дефектоскопия тәуекелдері.', operations: 'ТО, Digital Twin телеметриясы, RTH және ұшу алдындағы бақылау.' },
-    stageOptions: { design: ['Fixed Wing', 'Hybrid VTOL', 'Multirotor', 'CubeSat / Satellite'], manufacturing: ['Допуски', 'Ультрадыбыс', 'Рентген'], operations: ['ТО', 'Digital Twin', 'RTH'] },
+    stageSummaries: { design: 'Аэродинамика, беріктік, қуат және схема таңдауы бойынша талдау.', manufacturing: 'Материал, қосылыс, өндіріс сериясы және дефектоскопия тәуекелдері.', operations: 'Техникалық қызмет, цифрлық егіз телеметриясы, авариялық қайту және ұшу алдындағы бақылау.' },
+    stageOptions: { design: ['Самолёт схемасы', 'Гибридті VTOL', 'Мультиротор', 'Кубсат / спутник'], manufacturing: ['Рұқсаттар', 'Ультрадыбыс', 'Рентген'], operations: ['Техникалық қызмет', 'Цифрлық егіз', 'Авариялық қайту'] },
   },
   ru: {
     titles: { design: 'Рекомендуемая конфигурация', manufacturing: 'Производственный маршрут', operations: 'Регламент эксплуатации' },
@@ -73,14 +73,14 @@ export function DesignRecommendation({ stage, options, requirements }: Props) {
           </article>
         ))}
       </div>
-      {stage === 'manufacturing' && <MaterialProcessAnalysis />}
+      {stage === 'manufacturing' && <MaterialProcessAnalysis language={language} />}
     </section>
   );
 }
 
 function getDesignHeadline(bestName: string, requirements: MissionRequirements, language: Language) {
   if (requirements.vehicleDomain === 'spacecraft') {
-    const orbit = language === 'ru' ? orbitName(requirements.orbitClass) : requirements.orbitClass.toUpperCase();
+    const orbit = orbitName(requirements.orbitClass, language);
     return { primary: vehicleName('CubeSat / Satellite', language), secondary: orbit };
   }
 
@@ -89,6 +89,7 @@ function getDesignHeadline(bestName: string, requirements: MissionRequirements, 
 
 function getDesignOptions(options: DesignOption[], requirements: MissionRequirements, language: Language) {
   if (requirements.vehicleDomain === 'spacecraft') {
+    if (language === 'kk') return ['Кубсат / спутник', 'Төмен орбитадағы пайдалы жүк', 'Геостационарлық орбитадағы пайдалы жүк', 'Орналастырылған пайдалы жүк'];
     if (language === 'ru') return ['Кубсат / спутник', 'Полезная нагрузка на низкой орбите', 'Полезная нагрузка на геостационарной орбите', 'Размещённая полезная нагрузка'];
     return ['CubeSat / Satellite', 'LEO payload', 'GEO payload', 'Hosted payload'];
   }
@@ -96,23 +97,53 @@ function getDesignOptions(options: DesignOption[], requirements: MissionRequirem
   return options.map((option) => vehicleName(option.name, language));
 }
 
-function MaterialProcessAnalysis() {
-  const rows = [
-    { material: 'Углепластик', strength: 'Высокая ★★★★★', process: 'Автоклав / вакуум', risk: 'Расслоение' },
-    { material: 'Алюминий 7075-Т6', strength: 'Средняя ★★★☆☆', process: 'ЧПУ-фрезерование', risk: 'Коррозия в узлах' },
-    { material: 'Титан ВТ6', strength: 'Высокая ★★★★☆', process: 'Сложная ЧПУ / лазер', risk: 'Высокая стоимость' },
-  ];
+function MaterialProcessAnalysis({ language }: { language: Language }) {
+  const copy = {
+    kk: {
+      title: 'Материалдар мен процестерді талдау',
+      strength: 'Меншікті беріктік',
+      process: 'Өңдеу',
+      risk: 'Тәуекел',
+      rows: [
+        { material: 'Көмірпластик', strength: 'Жоғары *****', process: 'Автоклав / вакуум', risk: 'Қабаттардың ажырауы' },
+        { material: 'Алюминий 7075-Т6', strength: 'Орташа ***--', process: 'ЧПУ-фрезерлеу', risk: 'Түйіндердегі коррозия' },
+        { material: 'Титан ВТ6', strength: 'Жоғары ****-', process: 'Күрделі ЧПУ / лазер', risk: 'Жоғары баға' },
+      ],
+    },
+    ru: {
+      title: 'Анализ материалов и процессов',
+      strength: 'Удельная прочность',
+      process: 'Обработка',
+      risk: 'Риск',
+      rows: [
+        { material: 'Углепластик', strength: 'Высокая *****', process: 'Автоклав / вакуум', risk: 'Расслоение' },
+        { material: 'Алюминий 7075-Т6', strength: 'Средняя ***--', process: 'ЧПУ-фрезерование', risk: 'Коррозия в узлах' },
+        { material: 'Титан ВТ6', strength: 'Высокая ****-', process: 'Сложная ЧПУ / лазер', risk: 'Высокая стоимость' },
+      ],
+    },
+    en: {
+      title: 'Materials and process analysis',
+      strength: 'Specific strength',
+      process: 'Processing',
+      risk: 'Risk',
+      rows: [
+        { material: 'CFRP', strength: 'High *****', process: 'Autoclave / vacuum', risk: 'Delamination' },
+        { material: 'Aluminum 7075-T6', strength: 'Medium ***--', process: 'CNC milling', risk: 'Joint corrosion' },
+        { material: 'Titanium Ti-6Al-4V', strength: 'High ****-', process: 'Complex CNC / laser', risk: 'High cost' },
+      ],
+    },
+  }[language];
 
   return (
     <div className="material-analysis">
-      <p className="eyebrow">Анализ материалов и процессов</p>
+      <p className="eyebrow">{copy.title}</p>
       <div className="material-analysis__grid">
-        {rows.map((row) => (
+        {copy.rows.map((row) => (
           <article className="material-analysis__item" key={row.material}>
             <h3>{row.material}</h3>
-            <p><span>Удельная прочность:</span> {row.strength}</p>
-            <p><span>Обработка:</span> {row.process}</p>
-            <p><span>Риск:</span> {row.risk}</p>
+            <p><span>{copy.strength}:</span> {row.strength}</p>
+            <p><span>{copy.process}:</span> {row.process}</p>
+            <p><span>{copy.risk}:</span> {row.risk}</p>
           </article>
         ))}
       </div>
@@ -123,51 +154,91 @@ function MaterialProcessAnalysis() {
 function getPropulsion(requirements: MissionRequirements, language: Language) {
   const engine = requirements.vehicleScheme === 'cubesat-satellite' ? 'electric / reaction control' : requirements.engineType;
   const source = requirements.energySource === 'li-ion' ? 'Li-Ion/LiPo' : requirements.energySource;
-  if (language === 'ru') return `${engineName(engine)}, ${energyName(source)}`;
+  if (language !== 'en') return `${engineName(engine, language)}, ${energyName(source, language)}`;
   return `${engine}, ${source}`;
 }
 
 function getStageHeadline(stage: EngineeringStage, requirements: MissionRequirements, language: Language) {
   if (stage === 'manufacturing') return { primary: materialName(requirements.material, language), secondary: jointName(requirements.jointMethod, language) };
-  if (language === 'ru') return { primary: environmentName(requirements.environment), secondary: checklistName(requirements.checklistStatus) };
+  if (language !== 'en') return { primary: environmentName(requirements.environment, language), secondary: checklistName(requirements.checklistStatus, language) };
   return { primary: requirements.environment, secondary: requirements.checklistStatus };
 }
 
 function vehicleName(name: string, language: Language) {
-  if (language !== 'ru') return name;
-  if (name === 'Fixed Wing') return 'Самолётная схема';
-  if (name === 'Hybrid VTOL') return 'Гибридный вертикальный взлёт';
-  if (name === 'Multirotor') return 'Мультиротор';
-  if (name === 'CubeSat / Satellite') return 'Кубсат / спутник';
+  if (language === 'kk') {
+    if (name === 'Fixed Wing') return 'Самолёт схемасы';
+    if (name === 'Hybrid VTOL') return 'Гибридті VTOL';
+    if (name === 'Multirotor') return 'Мультиротор';
+    if (name === 'CubeSat / Satellite') return 'Кубсат / спутник';
+  }
+  if (language === 'ru') {
+    if (name === 'Fixed Wing') return 'Самолётная схема';
+    if (name === 'Hybrid VTOL') return 'Гибридный вертикальный взлёт';
+    if (name === 'Multirotor') return 'Мультиротор';
+    if (name === 'CubeSat / Satellite') return 'Кубсат / спутник';
+  }
   return name;
 }
 
-function orbitName(orbit: string) {
-  if (orbit === 'leo') return 'низкая околоземная орбита';
-  if (orbit === 'sso') return 'солнечно-синхронная орбита';
-  if (orbit === 'geo') return 'геостационарная орбита';
+function orbitName(orbit: string, language: Language) {
+  if (language === 'kk') {
+    if (orbit === 'leo') return 'төмен Жер орбитасы';
+    if (orbit === 'sso') return 'күн-синхронды орбита';
+    if (orbit === 'geo') return 'геостационарлық орбита';
+  }
+  if (language === 'ru') {
+    if (orbit === 'leo') return 'низкая околоземная орбита';
+    if (orbit === 'sso') return 'солнечно-синхронная орбита';
+    if (orbit === 'geo') return 'геостационарная орбита';
+  }
+  if (orbit === 'leo' || orbit === 'sso' || orbit === 'geo') return orbit.toUpperCase();
   return orbit;
 }
 
-function engineName(engine: string) {
-  if (engine === 'electric') return 'электрическая тяга';
-  if (engine === 'hybrid') return 'гибридная тяга';
-  if (engine === 'turbine') return 'микротурбина';
-  if (engine === 'electric / reaction control') return 'электрическая тяга и система ориентации';
+function engineName(engine: string, language: Language) {
+  if (language === 'kk') {
+    if (engine === 'electric') return 'электрлік тарту';
+    if (engine === 'hybrid') return 'гибридті тарту';
+    if (engine === 'turbine') return 'микротурбина';
+    if (engine === 'electric / reaction control') return 'электрлік тарту және бағдарлау жүйесі';
+  }
+  if (language === 'ru') {
+    if (engine === 'electric') return 'электрическая тяга';
+    if (engine === 'hybrid') return 'гибридная тяга';
+    if (engine === 'turbine') return 'микротурбина';
+    if (engine === 'electric / reaction control') return 'электрическая тяга и система ориентации';
+  }
   return engine;
 }
 
-function energyName(source: string) {
-  if (source === 'Li-Ion/LiPo') return 'литий-ионный/литий-полимерный аккумулятор';
-  if (source === 'fuel-cell') return 'водородный топливный элемент';
-  if (source === 'solar') return 'солнечное питание';
+function energyName(source: string, language: Language) {
+  if (language === 'kk') {
+    if (source === 'Li-Ion/LiPo') return 'литий-ион/литий-полимер аккумуляторы';
+    if (source === 'fuel-cell') return 'сутекті отын элементі';
+    if (source === 'solar') return 'күн энергиясы';
+  }
+  if (language === 'ru') {
+    if (source === 'Li-Ion/LiPo') return 'литий-ионный/литий-полимерный аккумулятор';
+    if (source === 'fuel-cell') return 'водородный топливный элемент';
+    if (source === 'solar') return 'солнечное питание';
+  }
   return source;
 }
 
 function materialName(material: string, language: Language) {
+  if (language === 'kk') {
+    if (material === 'aluminum-2024') return 'Al 2024';
+    if (material === 'aluminum-7075') return 'Al 7075';
+    if (material === 'carbon') return 'көмірпластик';
+    if (material === 'titanium') return 'титан';
+    if (material === 'dmls-metal') return 'DMLS металл';
+  }
   if (language === 'ru') {
+    if (material === 'aluminum-2024') return 'Al 2024';
+    if (material === 'aluminum-7075') return 'Al 7075';
     if (material === 'carbon') return 'углепластик';
     if (material === 'titanium') return 'титан';
+    if (material === 'dmls-metal') return 'DMLS металл';
   }
   if (material === 'aluminum-2024') return 'Al 2024';
   if (material === 'aluminum-7075') return 'Al 7075';
@@ -177,28 +248,52 @@ function materialName(material: string, language: Language) {
 }
 
 function jointName(joint: string, language: Language) {
-  if (language !== 'ru') return joint;
-  if (joint === 'riveting') return 'клёпка';
-  if (joint === 'welding') return 'сварка';
-  if (joint === 'laser-welding') return 'лазерная сварка';
-  if (joint === 'tig-welding') return 'аргонодуговая сварка';
-  if (joint === 'friction-welding') return 'сварка трением';
-  if (joint === 'adhesive') return 'клеевое соединение';
+  if (language === 'kk') {
+    if (joint === 'riveting') return 'тойтарма';
+    if (joint === 'welding') return 'дәнекерлеу';
+    if (joint === 'laser-welding') return 'лазерлік дәнекерлеу';
+    if (joint === 'tig-welding') return 'аргон-доғалы дәнекерлеу';
+    if (joint === 'friction-welding') return 'үйкеліспен дәнекерлеу';
+    if (joint === 'adhesive') return 'желімді қосылыс';
+  }
+  if (language === 'ru') {
+    if (joint === 'riveting') return 'клёпка';
+    if (joint === 'welding') return 'сварка';
+    if (joint === 'laser-welding') return 'лазерная сварка';
+    if (joint === 'tig-welding') return 'аргонодуговая сварка';
+    if (joint === 'friction-welding') return 'сварка трением';
+    if (joint === 'adhesive') return 'клеевое соединение';
+  }
   return joint;
 }
 
-function environmentName(environment: string) {
-  if (environment === 'normal') return 'нормальные условия';
-  if (environment === 'cold') return 'экстремальный холод';
-  if (environment === 'wind') return 'сильный ветер';
-  if (environment === 'space') return 'вакуум и радиация';
+function environmentName(environment: string, language: Language) {
+  if (language === 'kk') {
+    if (environment === 'normal') return 'қалыпты жағдай';
+    if (environment === 'cold') return 'экстремалды суық';
+    if (environment === 'wind') return 'қатты жел';
+    if (environment === 'space') return 'вакуум және радиация';
+  }
+  if (language === 'ru') {
+    if (environment === 'normal') return 'нормальные условия';
+    if (environment === 'cold') return 'экстремальный холод';
+    if (environment === 'wind') return 'сильный ветер';
+    if (environment === 'space') return 'вакуум и радиация';
+  }
   return environment;
 }
 
-function checklistName(status: string) {
-  if (status === 'ready') return 'готов';
-  if (status === 'partial') return 'частично готов';
-  if (status === 'blocked') return 'не готов';
+function checklistName(status: string, language: Language) {
+  if (language === 'kk') {
+    if (status === 'ready') return 'дайын';
+    if (status === 'partial') return 'жартылай дайын';
+    if (status === 'blocked') return 'дайын емес';
+  }
+  if (language === 'ru') {
+    if (status === 'ready') return 'готов';
+    if (status === 'partial') return 'частично готов';
+    if (status === 'blocked') return 'не готов';
+  }
   return status;
 }
 

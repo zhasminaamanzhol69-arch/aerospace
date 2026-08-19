@@ -10,6 +10,10 @@ export const aiReportText: Record<Language, {
   inputLabel: string;
   inputPlaceholder: string;
   emptyQuestion: string;
+  voiceStart: string;
+  voiceListening: string;
+  voiceStop: string;
+  voiceUnsupported: string;
   placeholder: string;
   risk: Record<string, string>;
 }> = {
@@ -23,6 +27,10 @@ export const aiReportText: Record<Language, {
     inputLabel: 'Инженерлік сұрақ',
     inputPlaceholder: 'Мысалы: осы миссия үшін қандай материал және тексеріс тәртібі керек?',
     emptyQuestion: 'Алдымен AI-ға сұрақ жазыңыз.',
+    voiceStart: 'Дауыспен айту',
+    voiceListening: 'Тыңдап тұрмын…',
+    voiceStop: 'Тоқтату',
+    voiceUnsupported: 'Бұл браузер дауысты тануды қолдамайды.',
     placeholder: 'AI таңдалған кезең бойынша қысқа инженерлік жауап береді.',
     risk: { Low: 'Төмен', Medium: 'Орташа', High: 'Жоғары' },
   },
@@ -36,6 +44,10 @@ export const aiReportText: Record<Language, {
     inputLabel: 'Ваш вопрос',
     inputPlaceholder: 'Например: как спутник держится на орбите или какой материал выбрать для крыла?',
     emptyQuestion: 'Сначала напиши вопрос для AI.',
+    voiceStart: 'Сказать голосом',
+    voiceListening: 'Слушаю…',
+    voiceStop: 'Остановить диктовку',
+    voiceUnsupported: 'Этот браузер не поддерживает голосовой ввод.',
     placeholder: 'ИИ отвечает на вопросы по авиации, космосу, аппаратам, полётам, производству и эксплуатации.',
     risk: { Low: 'Low', Medium: 'Medium', High: 'High' },
   },
@@ -49,6 +61,10 @@ export const aiReportText: Record<Language, {
     inputLabel: 'Engineering request',
     inputPlaceholder: 'Example: which material and verification flow fit this mission?',
     emptyQuestion: 'Write a question for AI first.',
+    voiceStart: 'Speak',
+    voiceListening: 'Listening…',
+    voiceStop: 'Stop dictation',
+    voiceUnsupported: 'This browser does not support voice input.',
     placeholder: 'AI will answer for the selected phase with recommendation, parameters, standards, and risks.',
     risk: { Low: 'Low', Medium: 'Medium', High: 'High' },
   },

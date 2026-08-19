@@ -38,7 +38,7 @@ export function ReviewsSection({ canReview }: Props) {
 
     const error = await addReview(rating, comment);
     if (error) {
-      setMessage(error === 'not-configured' ? copy.login : error);
+      setMessage(error === 'not-configured' || error === 'not-authenticated' ? copy.login : error);
       return;
     }
 
@@ -55,18 +55,24 @@ export function ReviewsSection({ canReview }: Props) {
         <h3>{copy.title}</h3>
         <p>{copy.subtitle}</p>
       </div>
-      <div className="reviews-section__stars" aria-label={copy.title}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button className={star <= rating ? 'is-active' : ''} key={star} onClick={() => setRating(star)} type="button">
-            ★
-          </button>
-        ))}
-      </div>
-      <label>
-        <span>{copy.comment}</span>
-        <textarea value={comment} onChange={(event) => setComment(event.target.value)} maxLength={500} rows={4} />
-      </label>
-      <button onClick={handleSubmit} type="button">{copy.submit}</button>
+      {canReview ? (
+        <>
+          <div className="reviews-section__stars" aria-label={copy.title}>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button className={star <= rating ? 'is-active' : ''} key={star} onClick={() => setRating(star)} type="button">
+                ★
+              </button>
+            ))}
+          </div>
+          <label>
+            <span>{copy.comment}</span>
+            <textarea value={comment} onChange={(event) => setComment(event.target.value)} maxLength={500} rows={4} />
+          </label>
+          <button onClick={handleSubmit} type="button">{copy.submit}</button>
+        </>
+      ) : (
+        <p className="reviews-section__guest">{copy.guest}</p>
+      )}
       {message && <p className="reviews-section__message">{message}</p>}
       <div className="reviews-section__list">
         {reviews.length === 0 ? <p>{copy.empty}</p> : reviews.map((review) => <ReviewItem key={review.id} review={review} />)}

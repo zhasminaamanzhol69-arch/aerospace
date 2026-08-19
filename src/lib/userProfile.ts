@@ -14,12 +14,28 @@ export type UserProfile = {
 export type SubscriptionPlan = 'free' | 'pro' | 'trial';
 
 const profileKey = 'aerospace-user-profile';
+const sessionProfileKey = 'aerospace-session-profile';
 
 export function loadUserProfile() {
   try {
-    const stored = localStorage.getItem(profileKey);
-    if (!stored) return null;
+    const savedProfile = localStorage.getItem(profileKey);
+    if (savedProfile) {
+      const parsed = parseProfile(savedProfile);
+      if (parsed?.nickname !== 'guest') return parsed;
+      localStorage.removeItem(profileKey);
+    }
 
+    const sessionProfile = sessionStorage.getItem(sessionProfileKey);
+    if (!sessionProfile) return null;
+
+    return parseProfile(sessionProfile);
+  } catch {
+    return null;
+  }
+}
+
+function parseProfile(stored: string) {
+  try {
     const parsed = JSON.parse(stored) as Partial<UserProfile>;
     if (!parsed.name || !parsed.nickname) return null;
 
@@ -42,8 +58,13 @@ export function saveUserProfile(profile: UserProfile) {
   localStorage.setItem(profileKey, JSON.stringify(profile));
 }
 
+export function saveSessionUserProfile(profile: UserProfile) {
+  sessionStorage.setItem(sessionProfileKey, JSON.stringify(profile));
+}
+
 export function clearUserProfile() {
   localStorage.removeItem(profileKey);
+  sessionStorage.removeItem(sessionProfileKey);
 }
 
 export function buildAuthProfile(user: User): UserProfile {

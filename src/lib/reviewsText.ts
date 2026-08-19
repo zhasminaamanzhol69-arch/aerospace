@@ -9,6 +9,7 @@ export const reviewsText: Record<Language, {
   empty: string;
   otherTitle: string;
   login: string;
+  guest: string;
   success: string;
   short: string;
 }> = {
@@ -21,6 +22,7 @@ export const reviewsText: Record<Language, {
     empty: 'Әзірге пікір жоқ.',
     otherTitle: 'Басқа қолданушылардың пікірлері',
     login: 'Пікір қалдыру үшін email немесе Google арқылы кіріңіз.',
+    guest: 'Сіз қонақ ретінде кірдіңіз. Пікір қалдыру үшін тіркеліңіз немесе аккаунтқа кіріңіз.',
     success: 'Пікір қосылды.',
     short: 'Комментарий кемінде 2 таңба болуы керек.',
   },
@@ -33,6 +35,7 @@ export const reviewsText: Record<Language, {
     empty: 'Пока отзывов нет.',
     otherTitle: 'Отзывы других пользователей',
     login: 'Чтобы оставить отзыв, войдите через email или Google.',
+    guest: 'Вы зашли как гость. Зарегистрируйтесь или войдите в аккаунт, чтобы оставить отзыв.',
     success: 'Отзыв добавлен.',
     short: 'Комментарий должен быть минимум 2 символа.',
   },
@@ -45,6 +48,7 @@ export const reviewsText: Record<Language, {
     empty: 'No reviews yet.',
     otherTitle: 'Reviews from other users',
     login: 'Sign in with email or Google to leave a review.',
+    guest: 'You are browsing as a guest. Register or sign in to leave a review.',
     success: 'Review added.',
     short: 'Comment must be at least 2 characters.',
   },

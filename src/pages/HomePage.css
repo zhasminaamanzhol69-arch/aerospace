@@ -51,27 +51,24 @@
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.36), 0 0 34px rgba(56, 189, 248, 0.08);
   overflow: hidden;
   position: relative;
-}
-
-.flight-visual img {
-  display: block;
-  height: 100%;
-  object-fit: cover;
-  width: 100%;
+  transform: translateZ(0);
 }
 
 .flight-visual::after {
   background:
-    linear-gradient(180deg, transparent 55%, rgba(7, 17, 31, 0.48)),
+    linear-gradient(180deg, transparent 64%, rgba(7, 17, 31, 0.42)),
     linear-gradient(90deg, rgba(7, 17, 31, 0.12), transparent 42%);
   content: '';
   inset: 0;
+  pointer-events: none;
   position: absolute;
+  z-index: 1;
 }
 
-.telemetry { position: absolute; z-index: 1; }
+.telemetry { position: absolute; z-index: 2; }
 
 .telemetry {
+  animation: telemetry-pulse 2.4s ease-in-out infinite;
   background: rgba(7, 17, 31, 0.82);
   border: 1px solid rgba(34, 197, 94, 0.35);
   border-radius: 6px;
@@ -83,7 +80,22 @@
 }
 
 .telemetry--one { left: 18px; top: 18px; }
-.telemetry--two { bottom: 18px; right: 18px; }
+.telemetry--two {
+  animation-delay: 1.2s;
+  bottom: 18px;
+  right: 18px;
+}
+
+@keyframes telemetry-pulse {
+  0%, 100% {
+    border-color: rgba(34, 197, 94, 0.35);
+    box-shadow: 0 0 18px rgba(34, 197, 94, 0.12);
+  }
+  50% {
+    border-color: rgba(34, 197, 94, 0.68);
+    box-shadow: 0 0 26px rgba(34, 197, 94, 0.28);
+  }
+}
 
 .mission-grid {
   align-items: stretch;
@@ -242,6 +254,7 @@
 
 @media (max-width: 980px) {
   .mission-hero { grid-template-columns: 1fr; }
+
 }
 
 @media (max-width: 760px) {

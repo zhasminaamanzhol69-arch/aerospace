@@ -1,22 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
-import { AgentWorkflow } from '../components/AgentWorkflow';
-import { AiEngineeringReport } from '../components/AiEngineeringReport';
-import { CalculatedParametersPanel } from '../components/CalculatedParametersPanel';
-import { DesignRecommendation } from '../components/DesignRecommendation';
-import { DigitalTwinPanel } from '../components/DigitalTwinPanel';
-import { DomainContextPanel } from '../components/DomainContextPanel';
-import { EngineeringCalculator } from '../components/EngineeringCalculator';
 import { FaqSection } from '../components/FaqSection';
+import { HeroAnimation } from '../components/HeroAnimation';
 import { HomeQuickActions } from '../components/HomeQuickActions';
 import { IntroSplash } from '../components/IntroSplash';
 import { LanguageSelector } from '../components/LanguageSelector';
-import { MissionInputForm } from '../components/MissionInputForm';
+import { MainEngineeringWorkspace } from '../components/MainEngineeringWorkspace';
 import { ProfileMenu } from '../components/ProfileMenu';
 import { SiteMenu } from '../components/SiteMenu';
-import { StageEngineeringSuite } from '../components/StageEngineeringSuite';
-import { StageTabs } from '../components/StageTabs';
+import { TutorialGate } from '../components/TutorialGate';
 import { UserGate } from '../components/UserGate';
-import { VehicleDomainTabs } from '../components/VehicleDomainTabs';
 import {
   buildDesignOptions,
   calculateMissionParameters,
@@ -28,27 +20,38 @@ import { useLanguage } from '../lib/language';
 import {
   clearUserProfile,
   loadUserProfile,
+  saveSessionUserProfile,
   saveUserProfile,
   type UserProfile,
 } from '../lib/userProfile';
 import { heroText } from '../lib/homeText';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { useGoogleAuthProfile } from '../lib/useGoogleAuthProfile';
-import aviationHeroImage from '../assets/aviation-domain-hero.png';
-import spacecraftHeroImage from '../assets/spacecraft-domain-hero.png';
 import './HomePage.css';
+
+const onboardingKey = 'aerospace-onboarding-done';
+
+function hasFinishedOnboarding() {
+  return sessionStorage.getItem(onboardingKey) === 'true';
+}
+
+function finishOnboarding() {
+  sessionStorage.setItem(onboardingKey, 'true');
+}
 
 export function HomePage() {
   const { language } = useLanguage();
   const initialProfile = useMemo(() => loadUserProfile(), []);
   const [profile, setProfile] = useState<UserProfile | null>(initialProfile);
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(() => !initialProfile && !hasFinishedOnboarding());
+  const [showTutorialGate, setShowTutorialGate] = useState(() => !initialProfile && !hasFinishedOnboarding());
   const [stage, setStage] = useState<EngineeringStage>('design');
   const [requirements, setRequirements] = useState<MissionRequirements>(defaultRequirements);
   const parameters = useMemo(() => calculateMissionParameters(requirements), [requirements]);
   const options = useMemo(() => buildDesignOptions(requirements), [requirements]);
   const text = heroText[language];
   const isSpacecraft = requirements.vehicleDomain === 'spacecraft';
+  const canReview = Boolean(profile?.email && profile.nickname !== 'guest');
   const applyProfile = useCallback((nextProfile: UserProfile) => {
     setProfile(nextProfile);
     setShowIntro(false);
@@ -56,34 +59,29 @@ export function HomePage() {
   useGoogleAuthProfile(applyProfile);
 
   function handleProfileComplete(nextProfile: UserProfile) {
-    saveUserProfile(nextProfile);
+    if (nextProfile.nickname === 'guest') saveSessionUserProfile(nextProfile);
+    else saveUserProfile(nextProfile);
+    finishOnboarding();
     setProfile(nextProfile);
     setShowIntro(false);
+    setShowTutorialGate(false);
   }
 
   async function handleLogout() {
     if (isSupabaseConfigured) await supabase.auth.signOut();
     clearUserProfile();
     setProfile(null);
-  }
-
-  function updateDomain(vehicleDomain: MissionRequirements['vehicleDomain']) {
-    setRequirements((current) => ({
-      ...current,
-      vehicleDomain,
-      vehicleScheme: vehicleDomain === 'spacecraft' ? 'cubesat-satellite' : 'fixed-wing',
-      environment: vehicleDomain === 'spacecraft' ? 'space' : 'normal',
-      energySource: vehicleDomain === 'spacecraft' ? 'solar' : 'li-ion',
-      missionMode: vehicleDomain === 'spacecraft' ? 'orbital' : 'waypoint',
-      material: vehicleDomain === 'spacecraft' ? 'titanium' : 'carbon',
-      manufacturingMethod: vehicleDomain === 'spacecraft' ? 'dmls' : 'autoclave',
-      jointMethod: vehicleDomain === 'spacecraft' ? 'welding' : 'adhesive',
-    }));
+    setShowTutorialGate(true);
   }
 
   return (
-    showIntro && !profile ? (
+    showIntro ? (
       <IntroSplash onDone={() => setShowIntro(false)} />
+    ) : showTutorialGate ? (
+      <TutorialGate onContinue={() => {
+        finishOnboarding();
+        setShowTutorialGate(false);
+      }} />
     ) : (
       <main className="container mission-page">
         <div className="top-bar">
@@ -95,9 +93,6 @@ export function HomePage() {
           <UserGate onComplete={handleProfileComplete} />
         ) : (
           <>
-        <VehicleDomainTabs value={requirements.vehicleDomain} onChange={updateDomain} />
-        <StageTabs value={stage} onChange={setStage} />
-        <DomainContextPanel stage={stage} domain={requirements.vehicleDomain} />
         <section className="mission-hero">
           <div>
             <p className="eyebrow">{text.eyebrow}</p>
@@ -105,7 +100,7 @@ export function HomePage() {
             <p>{text.body}</p>
           </div>
           <div className="flight-visual">
-            <img src={isSpacecraft ? spacecraftHeroImage : aviationHeroImage} alt={text.imageAlt} />
+            <HeroAnimation isSpacecraft={isSpacecraft} label={text.imageAlt} />
             <span className="telemetry telemetry--one">{isSpacecraft ? 'ORB LEO' : 'ALT 1200m'}</span>
             <span className="telemetry telemetry--two">{isSpacecraft ? 'SOL 180W' : 'BAT 78%'}</span>
           </div>
@@ -113,30 +108,16 @@ export function HomePage() {
 
         <HomeQuickActions />
 
-        <AgentWorkflow stage={stage} domain={requirements.vehicleDomain} />
+        <MainEngineeringWorkspace
+          onRequirementsChange={setRequirements}
+          onStageChange={setStage}
+          options={options}
+          parameters={parameters}
+          requirements={requirements}
+          stage={stage}
+        />
 
-        <section className="mission-grid">
-          <MissionInputForm stage={stage} requirements={requirements} onChange={setRequirements} />
-          <CalculatedParametersPanel stage={stage} parameters={parameters} requirements={requirements} />
-        </section>
-
-        <EngineeringCalculator requirements={requirements} parameters={parameters} />
-
-        <StageEngineeringSuite stage={stage} requirements={requirements} parameters={parameters} options={options} />
-
-        {stage === 'operations' ? (
-          <section className="mission-grid" id="ai-agent">
-            <DigitalTwinPanel parameters={parameters} requirements={requirements} />
-            <AiEngineeringReport stage={stage} requirements={requirements} parameters={parameters} options={options} />
-          </section>
-        ) : (
-          <section className="mission-grid" id="ai-agent">
-            <DesignRecommendation stage={stage} options={options} requirements={requirements} />
-            <AiEngineeringReport stage={stage} requirements={requirements} parameters={parameters} options={options} />
-          </section>
-        )}
-
-        <FaqSection canReview={Boolean(profile)} />
+        <FaqSection canReview={canReview} />
           </>
         )}
       </main>

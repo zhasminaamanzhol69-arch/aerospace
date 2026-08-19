@@ -1,0 +1,91 @@
+.mock-screen {
+  aspect-ratio: 1.08;
+  background: rgba(15, 35, 55, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.3);
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  position: relative;
+  width: min(320px, 100%);
+}
+
+.mock-screen__header,
+.mock-screen__hero,
+.mock-screen__panel {
+  border-radius: 8px;
+}
+
+.mock-screen__header {
+  align-items: center;
+  background: rgba(56, 189, 248, 0.16);
+  color: var(--accent);
+  display: flex;
+  font-size: 13px;
+  font-weight: 900;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.mock-screen__menu-dot,
+.mock-screen__menu-dot::before,
+.mock-screen__menu-dot::after {
+  background: currentColor;
+  border-radius: 50%;
+  content: '';
+  display: block;
+  height: 5px;
+  width: 5px;
+}
+
+.mock-screen__menu-dot {
+  box-shadow: 0 0 0 7px rgba(56, 189, 248, 0.12);
+  position: relative;
+}
+
+.mock-screen__menu-dot::before,
+.mock-screen__menu-dot::after {
+  position: absolute;
+  top: 0;
+}
+
+.mock-screen__menu-dot::before { left: -8px; }
+.mock-screen__menu-dot::after { right: -8px; }
+
+.mock-screen__hero {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.54), rgba(34, 197, 94, 0.38));
+}
+
+.mock-screen__panel {
+  background: rgba(7, 17, 31, 0.72);
+  border: 1px solid rgba(56, 189, 248, 0.16);
+}
+
+.mock-screen__cursor {
+  animation: tutorial-click 2.1s ease-in-out infinite;
+  background: #f8fafc;
+  border-radius: 999px;
+  box-shadow: 0 0 0 8px rgba(56, 189, 248, 0.16);
+  height: 18px;
+  position: absolute;
+  right: 23%;
+  top: 48%;
+  width: 18px;
+}
+
+.mock-screen--1 .mock-screen__cursor {
+  left: 22%;
+  right: auto;
+  top: 64%;
+}
+
+.mock-screen--2 .mock-screen__cursor {
+  right: 18%;
+  top: 28%;
+}
+
+@keyframes tutorial-click {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.32); }
+}

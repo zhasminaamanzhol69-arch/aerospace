@@ -15,40 +15,40 @@ const tabs: Array<{
   {
     value: 'design',
     label: {
-      kk: '1. Жобалау',
-      ru: '1. Проектирование',
-      en: '1. Design & Engineering',
+      kk: '01 Жобалау',
+      ru: '01 Проектирование',
+      en: '01 Design',
     },
     detail: {
-      kk: 'Аэродинамика, беріктік, қуат',
-      ru: 'Аэродинамика, прочность, мощность',
-      en: 'Aerodynamics, loads, power',
+      kk: 'Аэродинамика · беріктік · қуат',
+      ru: 'Аэродинамика · прочность · мощность',
+      en: 'Aerodynamics · loads · power',
     },
   },
   {
     value: 'manufacturing',
     label: {
-      kk: '2. Дайындау',
-      ru: '2. Производство',
-      en: '2. Manufacturing',
+      kk: '02 Дайындау',
+      ru: '02 Производство',
+      en: '02 Manufacturing',
     },
     detail: {
-      kk: 'Материал, қосылыс, жинақтау',
-      ru: 'Материалы, соединения, сборка',
-      en: 'Materials, joining, assembly',
+      kk: 'Материал · қосылыс · жинақтау',
+      ru: 'Материалы · соединения · сборка',
+      en: 'Materials · joining · assembly',
     },
   },
   {
     value: 'operations',
     label: {
-      kk: '3. Пайдалану',
-      ru: '3. Эксплуатация',
-      en: '3. Operations',
+      kk: '03 Пайдалану',
+      ru: '03 Эксплуатация',
+      en: '03 Operations',
     },
     detail: {
-      kk: 'Сынақ, телеметрия, қауіпсіздік',
-      ru: 'Испытания, телеметрия, безопасность',
-      en: 'Testing, telemetry, safety',
+      kk: 'Сынақ · телеметрия · қауіпсіздік',
+      ru: 'Испытания · телеметрия · безопасность',
+      en: 'Testing · telemetry · safety',
     },
   },
 ];

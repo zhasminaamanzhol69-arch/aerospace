@@ -63,22 +63,22 @@ function buildRussianReport(
 
 function buildKazakhReport(req: MissionRequirements, params: CalculatedParameters, options: DesignOption[], stage: EngineeringStage, question: string) {
   const designDecision = req.vehicleDomain === 'spacecraft'
-    ? `"${question}" бойынша базалық сәулет: CubeSat/Satellite, орбита ${req.orbitClass.toUpperCase()}, күн панелі ${req.solarArrayW} W.`
-    : `"${question}" бойынша базалық сәулет: ${options[0]?.name ?? req.vehicleScheme}, материал ${materialName(req.material)}, MTOW ${params.estimatedTakeoffMassKg} kg.`;
+    ? `"${question}" бойынша базалық сәулет: кубсат / спутник, орбита ${req.orbitClass.toUpperCase()}, күн панелі ${req.solarArrayW} Вт.`
+    : `"${question}" бойынша базалық сәулет: ${optionNameKk(options[0]?.name ?? req.vehicleScheme)}, материал ${materialNameKk(req.material)}, ұшу массасы ${params.estimatedTakeoffMassKg} кг.`;
 
   return commonReport({
     active: stageName.kk[stage],
     decision: selectByStage(stage, {
       design: designDecision,
-      manufacturing: `Өндірістік маршрут: ${materialName(req.material)}, процесс ${processName(req.manufacturingMethod)}, қосылыс ${req.jointMethod}.`,
-      operations: `Пайдалану: байланыс ${params.linkQualityPercent}%, ресурс ${params.serviceLifeHours} h және anomaly ${params.anomalyStatus} бақылау.`,
+      manufacturing: `Өндірістік маршрут: ${materialNameKk(req.material)}, процесс ${processNameKk(req.manufacturingMethod)}, қосылыс ${jointNameKk(req.jointMethod)}.`,
+      operations: `Пайдалану: байланыс ${params.linkQualityPercent}%, ресурс ${params.serviceLifeHours} сағ және ақау статусы ${statusNameKk(params.anomalyStatus)} бақылауда.`,
     }),
     standards: selectByStage(stage, {
       design: 'NASA-STD-5001 және ECSS-E/ST нақты пунктсіз тек жалпы инженерлік негіз ретінде көрсетіледі.',
       manufacturing: 'ECSS-Q-ST-70C, ISO 9001/AS9100, ГОСТ 18353 және ISO 2768-m өндіріс пен бақылауға қатысты.',
       operations: 'ECSS-E-ST-10-03C, FAA Part 107/ICAO немесе ГОСТ нормалары аппарат класына қарай қолданылады.',
     }),
-    params: `Қуат ${params.requiredPowerW} W, энергия ${params.requiredEnergyWh} Wh, MOS ${params.marginOfSafety}, тәуекел ${params.riskLevel}.`,
+    params: `Қуат ${params.requiredPowerW} Вт, энергия ${params.requiredEnergyWh} Вт·сағ, беріктік қоры ${params.marginOfSafety}, тәуекел ${riskNameKk(params.riskLevel)}.`,
     risks: 'Аппарат класы, орта және миссия режимі сәйкес екенін тексеру керек.',
     language: 'kk',
   });
@@ -115,18 +115,50 @@ function commonReport(data: {
   risks: string;
   language: Language;
 }) {
-  const unknown = data.language === 'ru' ? 'В имеющихся нормативных документах нет точной информации по пунктам/таблицам данного запроса.' : 'Exact clauses/tables are not available in the current context.';
-  return `Этап: ${data.active}
+  const labels = {
+    kk: {
+      unknown: 'Қазіргі контексте нақты тармақтар/кестелер жоқ.',
+      stage: 'Кезең',
+      summary: 'Қысқа қорытынды',
+      recommendation: 'Ұсыныс',
+      params: 'Есептік параметрлер',
+      standards: 'Стандарттар',
+      risks: 'Тәуекелдер',
+      recommendationText: 'таңдалған параметрлерді алдын ала инженерлік бағалау ретінде қолданып, материал паспорты, аппарат моделі және миссия талаптары бойынша нақтылау.',
+    },
+    ru: {
+      unknown: 'В имеющихся нормативных документах нет точной информации по пунктам/таблицам данного запроса.',
+      stage: 'Этап',
+      summary: 'Краткий вывод',
+      recommendation: 'Рекомендация',
+      params: 'Расчётные параметры',
+      standards: 'Стандарты',
+      risks: 'Риски',
+      recommendationText: 'использовать выбранные параметры как предварительную инженерную оценку и уточнить их по паспорту материала, модели аппарата и требованиям миссии.',
+    },
+    en: {
+      unknown: 'Exact clauses/tables are not available in the current context.',
+      stage: 'Stage',
+      summary: 'Summary',
+      recommendation: 'Recommendation',
+      params: 'Calculated parameters',
+      standards: 'Standards',
+      risks: 'Risks',
+      recommendationText: 'use the selected values as a preliminary engineering estimate and refine them against material data, vehicle model, and mission requirements.',
+    },
+  }[data.language];
 
-Краткий вывод: ${data.decision}
+  return `${labels.stage}: ${data.active}
 
-Рекомендация: использовать выбранные параметры как предварительную инженерную оценку и уточнить их по паспорту материала, модели аппарата и требованиям миссии.
+${labels.summary}: ${data.decision}
 
-Расчётные параметры: ${data.params}
+${labels.recommendation}: ${labels.recommendationText}
 
-Стандарты: ${data.standards} ${unknown}
+${labels.params}: ${data.params}
 
-Риски: ${data.risks}`;
+${labels.standards}: ${data.standards} ${labels.unknown}
+
+${labels.risks}: ${data.risks}`;
 }
 
 function selectByStage(stage: EngineeringStage, values: Record<EngineeringStage, string>) {
@@ -163,6 +195,42 @@ function processNameRu(process: string) {
   return process;
 }
 
+function materialNameKk(material: string) {
+  if (material === 'carbon') return 'көмірпластик';
+  if (material === 'titanium') return 'титан ВТ6';
+  if (material === 'aluminum-7075') return 'алюминий 7075-Т6';
+  if (material === 'aluminum-2024') return 'алюминий-литий қорытпасы 2024';
+  if (material === 'dmls-metal') return 'DMLS металл';
+  return material;
+}
+
+function processNameKk(process: string) {
+  if (process === 'autoclave') return 'автоклавта қалыптау';
+  if (process === 'dmls') return 'металды лазерлік балқыту';
+  if (process === 'cnc') return 'ЧПУ-фрезерлеу';
+  if (process === 'vacuum-infusion') return 'вакуумдық инфузия';
+  if (process === 'additive-polymer') return 'полимерді 3D-басып шығару';
+  return process;
+}
+
+function jointNameKk(joint: string) {
+  if (joint === 'riveting') return 'тойтарма';
+  if (joint === 'welding') return 'дәнекерлеу';
+  if (joint === 'laser-welding') return 'лазерлік дәнекерлеу';
+  if (joint === 'tig-welding') return 'аргон-доғалы дәнекерлеу';
+  if (joint === 'friction-welding') return 'үйкеліспен дәнекерлеу';
+  if (joint === 'adhesive') return 'желімді қосылыс';
+  return joint;
+}
+
+function optionNameKk(option: string) {
+  if (option === 'Fixed Wing' || option === 'fixed-wing') return 'самолёт схемасы';
+  if (option === 'Hybrid VTOL' || option === 'hybrid-vtol') return 'гибридті VTOL';
+  if (option === 'Multirotor' || option === 'multirotor') return 'мультиротор';
+  if (option === 'CubeSat / Satellite' || option === 'cubesat-satellite') return 'кубсат / спутник';
+  return option;
+}
+
 function optionName(option: string) {
   if (option === 'Fixed Wing' || option === 'fixed-wing') return 'самолётная схема';
   if (option === 'Hybrid VTOL' || option === 'hybrid-vtol') return 'гибридный вертикальный взлёт';
@@ -188,5 +256,18 @@ function riskName(value: string) {
   if (value === 'Low') return 'низкий';
   if (value === 'Medium') return 'средний';
   if (value === 'High') return 'высокий';
+  return value;
+}
+
+function riskNameKk(value: string) {
+  if (value === 'Low') return 'төмен';
+  if (value === 'Medium') return 'орташа';
+  if (value === 'High') return 'жоғары';
+  return value;
+}
+
+function statusNameKk(value: string) {
+  if (value === 'OK') return 'норма';
+  if (value === 'Warning') return 'ескерту';
   return value;
 }

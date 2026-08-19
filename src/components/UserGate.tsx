@@ -12,7 +12,7 @@ const initialForm: UserGateForm = { name: '', surname: '', nickname: '', email: 
 
 export function UserGate({ onComplete }: Props) {
   const { language } = useLanguage();
-  const [mode, setMode] = useState<AuthMode>('login');
+  const [mode, setMode] = useState<AuthMode>('signup');
   const [form, setForm] = useState<UserGateForm>(initialForm);
   const [error, setError] = useState('');
   const copy = userGateText[language];

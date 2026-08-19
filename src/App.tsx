@@ -7,6 +7,7 @@ import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SpacecraftPage } from './pages/SpacecraftPage';
+import { ArticlesPage } from './pages/ArticlesPage';
 
 // Здесь живут только маршруты. Сами экраны складывай в src/pages/.
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/drones" component={DronesPage} />
         <Route path="/spacecraft" component={SpacecraftPage} />
         <Route path="/documents" component={DocumentsPage} />
+        <Route path="/articles" component={ArticlesPage} />
         <Route path="/profile" component={ProfilePage} />
         <Route component={NotFoundPage} />
       </Switch>

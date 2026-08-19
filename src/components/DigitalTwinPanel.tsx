@@ -20,11 +20,11 @@ const text: Record<Language, { title: string; body: string; purposeTitle: string
     body: 'Виртуалды модель температураны, батареяны, массаны және ұшу режимін бақылайды, содан кейін алдын ала техникалық шешім ұсынады.',
     purposeTitle: 'Бұл не үшін керек',
     steps: [
-      { label: 'Real UAV', description: 'Бұл нақты ұшатын аппарат: дрон, ұшақ немесе сынақ прототипі.', purpose: 'Нақты аппараттан бастапқы деректерді алу үшін керек.' },
-      { label: 'Telemetry', description: 'Аппарат жіберетін деректер: батарея, температура, биіктік, жылдамдық және режим.', purpose: 'Жүйенің жағдайын нақты уақытта көру үшін керек.' },
-      { label: 'Digital Twin', description: 'Компьютердегі виртуалды көшірме нақты аппараттың күйін қайталайды.', purpose: 'Қауіпсіз ортада аппаратты талдау және тестілеу үшін керек.' },
-      { label: 'Prediction', description: 'AI келесі жағдайды болжайды: энергия жетпеуі, қызу немесе істен шығу қаупі.', purpose: 'Мәселені алдын ала байқау үшін керек.' },
-      { label: 'Engineering Decision', description: 'Инженерге ұсыныс: жүктемені азайту, батареяны өзгерту немесе конструкцияны жақсарту.', purpose: 'Дұрыс техникалық шешім қабылдау үшін керек.' },
+      { label: 'Нақты БПЛА', description: 'Бұл нақты ұшатын аппарат: дрон, ұшақ немесе сынақ прототипі.', purpose: 'Нақты аппараттан бастапқы деректерді алу үшін керек.' },
+      { label: 'Телеметрия', description: 'Аппарат жіберетін деректер: батарея, температура, биіктік, жылдамдық және режим.', purpose: 'Жүйенің жағдайын нақты уақытта көру үшін керек.' },
+      { label: 'Цифрлық егіз', description: 'Компьютердегі виртуалды көшірме нақты аппараттың күйін қайталайды.', purpose: 'Қауіпсіз ортада аппаратты талдау және тестілеу үшін керек.' },
+      { label: 'Болжам', description: 'AI келесі жағдайды болжайды: энергия жетпеуі, қызу немесе істен шығу қаупі.', purpose: 'Мәселені алдын ала байқау үшін керек.' },
+      { label: 'Инженерлік шешім', description: 'Инженерге ұсыныс: жүктемені азайту, батареяны өзгерту немесе конструкцияны жақсарту.', purpose: 'Дұрыс техникалық шешім қабылдау үшін керек.' },
     ],
   },
   ru: {
@@ -68,24 +68,24 @@ export function DigitalTwinPanel({ parameters, requirements }: Props) {
   return (
     <section className="card twin-panel">
       <div>
-        <p className="eyebrow">{language === 'ru' ? 'Эксплуатация и телеметрия цифрового двойника' : 'Operations & Digital Twin Telemetry'}</p>
+        <p className="eyebrow">{panelEyebrow(language)}</p>
         <h2>{copy.title}</h2>
       </div>
       <div className="telemetry-chain" aria-label="Operations telemetry chain">
         <article>
-          <strong>{language === 'ru' ? 'РЕАЛЬНЫЙ АППАРАТ' : 'REAL VEHICLE'}</strong>
+          <strong>{chainLabel('vehicle', language)}</strong>
           <span>{vehicleLabel(requirements, isSpacecraft, language)}</span>
         </article>
         <article>
-          <strong>{language === 'ru' ? 'ТЕЛЕМЕТРИЯ 50 Гц' : 'TELEMETRY 50 Hz'}</strong>
+          <strong>{chainLabel('telemetry', language)}</strong>
           <span>{telemetry}</span>
         </article>
         <article>
-          <strong>{language === 'ru' ? 'ЦИФРОВОЙ ДВОЙНИК' : 'DIGITAL TWIN'}</strong>
+          <strong>{chainLabel('twin', language)}</strong>
           <span>{twinState}</span>
         </article>
         <article>
-          <strong>{language === 'ru' ? 'ПРОГНОЗ ИИ' : 'AI FORECAST'}</strong>
+          <strong>{chainLabel('forecast', language)}</strong>
           <span>{prediction}</span>
         </article>
       </div>
@@ -113,27 +113,36 @@ export function DigitalTwinPanel({ parameters, requirements }: Props) {
 
 function buildPrediction(parameters: CalculatedParameters, isSpacecraft: boolean, language: Language) {
   if (parameters.anomalyStatus !== 'OK') {
+    if (language === 'kk') return isSpacecraft ? 'Ескерту: келесі сеансқа дейін қуат, жылу және байланысты тексеру' : 'Ескерту: келесі ұшуға дейін жылу режимі мен байланысты тексеру';
     if (language === 'ru') return isSpacecraft ? 'Предупреждение: проверить питание, тепло и связь до следующего сеанса' : 'Предупреждение: проверить нагрев и связь перед следующим полётом';
     return isSpacecraft ? 'Warning: check power/thermal link before next pass' : 'Warning: check thermal/link before next flight';
   }
 
+  if (language === 'kk') return isSpacecraft ? `Ақау жоқ / қызмет көрсету ${parameters.serviceLifeHours} сағ кейін` : `Ақау жоқ / қызмет көрсету ${parameters.serviceLifeHours} сағ кейін`;
   if (language === 'ru') return isSpacecraft ? `Аномалий нет / обслуживание через ${parameters.serviceLifeHours} ч` : `Аномалий нет / обслуживание через ${parameters.serviceLifeHours} ч`;
   return isSpacecraft ? `No anomaly / orbit service in ${parameters.serviceLifeHours} h` : `Аномалий не обнаружено / service in ${parameters.serviceLifeHours} h`;
 }
 
 function localizedSpaceTelemetry(requirements: MissionRequirements, language: Language) {
+  if (language === 'kk') return `Орбита ${requirements.orbitClass.toUpperCase()} / Күн ${requirements.solarArrayW} Вт / Радиация ${requirements.radiationToleranceKrad} крад`;
   if (language === 'ru') return `Орбита ${requirements.orbitClass.toUpperCase()} / Солнце ${requirements.solarArrayW} Вт / Радиация ${requirements.radiationToleranceKrad} крад`;
   return `Orbit ${requirements.orbitClass.toUpperCase()} / Solar ${requirements.solarArrayW}W / Rad ${requirements.radiationToleranceKrad}krad`;
 }
 
 function localizedAviationTelemetry(requirements: MissionRequirements, language: Language) {
+  if (language === 'kk') return `Температура ${requirements.motorTempC}°C / Аккумулятор ${requirements.batteryVoltageV} В / Діріл ${requirements.vibrationG}g`;
   if (language === 'ru') return `Температура ${requirements.motorTempC}°C / Аккумулятор ${requirements.batteryVoltageV} В / Вибрация ${requirements.vibrationG}g`;
   return `Temp ${requirements.motorTempC}°C / Batt ${requirements.batteryVoltageV}V / Vib ${requirements.vibrationG}g`;
 }
 
 function localizedTwinState(parameters: CalculatedParameters, requirements: MissionRequirements, isSpacecraft: boolean, language: Language) {
-  if (language !== 'ru') {
-    return isSpacecraft ? `Power ${parameters.requiredEnergyWh}Wh / Link ${parameters.linkQualityPercent}%` : `SoH ${requirements.batterySohPercent}% / Link ${parameters.linkQualityPercent}%`;
+  if (language === 'kk') {
+    return isSpacecraft
+      ? `Энергия ${parameters.requiredEnergyWh} Вт·сағ / Байланыс ${parameters.linkQualityPercent}%`
+      : `Аккумулятор күйі ${requirements.batterySohPercent}% / Байланыс ${parameters.linkQualityPercent}%`;
+  }
+  if (language === 'en') {
+    return isSpacecraft ? `Power ${parameters.requiredEnergyWh} Wh / Link ${parameters.linkQualityPercent}%` : `SoH ${requirements.batterySohPercent}% / Link ${parameters.linkQualityPercent}%`;
   }
 
   return isSpacecraft
@@ -142,6 +151,12 @@ function localizedTwinState(parameters: CalculatedParameters, requirements: Miss
 }
 
 function vehicleLabel(requirements: MissionRequirements, isSpacecraft: boolean, language: Language) {
+  if (language === 'kk') {
+    if (isSpacecraft) return 'Кубсат / спутник';
+    if (requirements.vehicleScheme === 'fixed-wing') return 'Самолёт схемасы';
+    if (requirements.vehicleScheme === 'hybrid-vtol') return 'Гибридті VTOL';
+    if (requirements.vehicleScheme === 'multirotor') return 'Мультиротор';
+  }
   if (language !== 'ru') return isSpacecraft ? 'CubeSat / Satellite' : requirements.vehicleScheme;
   if (isSpacecraft) return 'Кубсат / спутник';
   if (requirements.vehicleScheme === 'fixed-wing') return 'Самолётная схема';
@@ -150,16 +165,31 @@ function vehicleLabel(requirements: MissionRequirements, isSpacecraft: boolean, 
   return requirements.vehicleScheme;
 }
 
+function panelEyebrow(language: Language) {
+  if (language === 'kk') return 'Цифрлық егіздің пайдалануы және телеметриясы';
+  if (language === 'ru') return 'Эксплуатация и телеметрия цифрового двойника';
+  return 'Operations & Digital Twin Telemetry';
+}
+
+function chainLabel(key: string, language: Language) {
+  const labels = {
+    kk: { vehicle: 'НАҚТЫ АППАРАТ', telemetry: 'ТЕЛЕМЕТРИЯ 50 Гц', twin: 'ЦИФРЛЫҚ ЕГІЗ', forecast: 'AI БОЛЖАМЫ' },
+    ru: { vehicle: 'РЕАЛЬНЫЙ АППАРАТ', telemetry: 'ТЕЛЕМЕТРИЯ 50 Гц', twin: 'ЦИФРОВОЙ ДВОЙНИК', forecast: 'ПРОГНОЗ ИИ' },
+    en: { vehicle: 'REAL VEHICLE', telemetry: 'TELEMETRY 50 Hz', twin: 'DIGITAL TWIN', forecast: 'AI FORECAST' },
+  }[language];
+  return labels[key as keyof typeof labels];
+}
+
 function getDomainCopy(copy: typeof text.ru, domain: MissionRequirements['vehicleDomain'], language: Language) {
   if (domain === 'aviation') return copy;
 
   const spacecraftSteps: Record<Language, Step[]> = {
     kk: [
-      { label: 'Real Spacecraft', description: 'Бұл нақты CubeSat, спутник немесе ғарыштық пайдалы жүктеме.', purpose: 'Орбиталық аппараттан бастапқы телеметрияны алу үшін керек.' },
-      { label: 'Telemetry', description: 'Аппарат жіберетін деректер: орбита, қуат балансы, байланыс, температура және радиациялық орта.', purpose: 'Ғарыштық жүйенің күйін нақты уақытта бағалау үшін керек.' },
-      { label: 'Digital Twin', description: 'Виртуалды модель спутниктің орбиталық және жылулық күйін қайталайды.', purpose: 'Вакуум, термоцикл және қуат тәуекелдерін қауіпсіз талдау үшін керек.' },
-      { label: 'Prediction', description: 'AI энергия тапшылығын, байланыс үзілуін немесе қызу қаупін болжайды.', purpose: 'Келесі байланыс сеансына дейін ақауды алдын ала көру үшін керек.' },
-      { label: 'Engineering Decision', description: 'Инженерге ұсыныс: қуат режимін өзгерту, жүктемені шектеу немесе термоконтурды түзету.', purpose: 'Орбиталық миссияны қауіпсіз жалғастыру үшін керек.' },
+      { label: 'Нақты ғарыш аппараты', description: 'Бұл нақты CubeSat, спутник немесе ғарыштық пайдалы жүктеме.', purpose: 'Орбиталық аппараттан бастапқы телеметрияны алу үшін керек.' },
+      { label: 'Телеметрия', description: 'Аппарат жіберетін деректер: орбита, қуат балансы, байланыс, температура және радиациялық орта.', purpose: 'Ғарыштық жүйенің күйін нақты уақытта бағалау үшін керек.' },
+      { label: 'Цифрлық егіз', description: 'Виртуалды модель спутниктің орбиталық және жылулық күйін қайталайды.', purpose: 'Вакуум, термоцикл және қуат тәуекелдерін қауіпсіз талдау үшін керек.' },
+      { label: 'Болжам', description: 'AI энергия тапшылығын, байланыс үзілуін немесе қызу қаупін болжайды.', purpose: 'Келесі байланыс сеансына дейін ақауды алдын ала көру үшін керек.' },
+      { label: 'Инженерлік шешім', description: 'Инженерге ұсыныс: қуат режимін өзгерту, жүктемені шектеу немесе термоконтурды түзету.', purpose: 'Орбиталық миссияны қауіпсіз жалғастыру үшін керек.' },
     ],
     ru: [
       { label: 'Реальный космический аппарат', description: 'Это реальный кубсат, спутник или космическая полезная нагрузка.', purpose: 'Нужен как источник настоящей орбитальной телеметрии.' },

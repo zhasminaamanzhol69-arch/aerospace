@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { generateEngineeringReport } from '../lib/aiEngineeringReport';
 import { aiReportText } from '../lib/aiEngineeringReportText';
 import type { CalculatedParameters, DesignOption, MissionRequirements } from '../lib/aerospace';
 import type { EngineeringStage } from '../lib/engineeringStage';
 import { useLanguage } from '../lib/language';
+import { useVoiceDictation } from '../lib/useVoiceDictation';
 import './AiEngineeringReport.css';
 
 type Props = {
@@ -21,6 +22,15 @@ export function AiEngineeringReport({ stage, requirements, parameters, options }
   const [isLoading, setIsLoading] = useState(false);
   const copy = aiReportText[language];
   const best = options[0];
+  const appendVoiceText = useCallback((text: string) => {
+    setQuestion((current) => `${current}${current ? ' ' : ''}${text}`);
+  }, []);
+  const voice = useVoiceDictation({
+    language,
+    onError: setError,
+    onFinalText: appendVoiceText,
+    unsupportedMessage: copy.voiceUnsupported,
+  });
 
   useEffect(() => {
     setError('');
@@ -74,12 +84,32 @@ export function AiEngineeringReport({ stage, requirements, parameters, options }
 
       <label className="ai-report__input">
         <span>{copy.inputLabel}</span>
-        <textarea
-          onChange={(event) => setQuestion(event.target.value)}
-          placeholder={copy.inputPlaceholder}
-          rows={4}
-          value={question}
-        />
+        <div className="ai-report__voice-field">
+          <textarea
+            onChange={(event) => setQuestion(event.target.value)}
+            placeholder={copy.inputPlaceholder}
+            rows={4}
+            value={question}
+          />
+          <button
+            aria-label={voice.isListening ? copy.voiceStop : copy.voiceStart}
+            className={voice.isListening ? 'ai-report__voice is-listening' : 'ai-report__voice'}
+            disabled={!voice.isSupported}
+            onClick={() => {
+              setError('');
+              voice.toggle();
+            }}
+            type="button"
+          >
+            <span aria-hidden="true">●</span>
+            {voice.isListening ? copy.voiceStop : copy.voiceStart}
+          </button>
+        </div>
+        {voice.isListening && (
+          <p className="ai-report__dictation">
+            {voice.interimText || copy.voiceListening}
+          </p>
+        )}
       </label>
 
       <button type="button" onClick={handleGenerate} disabled={isLoading}>

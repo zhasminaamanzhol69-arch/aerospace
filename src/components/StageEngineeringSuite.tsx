@@ -43,7 +43,7 @@ export function StageEngineeringSuite({ stage, requirements, parameters, options
   }, [stage, requirements, parameters]);
 
   return (
-    <section className="card stage-suite">
+    <section className="card stage-suite" id="stage-suite">
       <SuiteHeader stage={stage} copy={copy} />
       {stage === 'design' && <DesignSuite mass={mass} energy={energy} options={options} copy={copy} language={language} />}
       {stage === 'manufacturing' && <ManufacturingSuite items={dfmItems} cost={estimateUnitCost(requirements, parameters)} copy={copy} language={language} />}
@@ -88,10 +88,12 @@ function DesignSuite({ mass, energy, options, copy, language }: { mass: ReturnTy
 }
 
 function ManufacturingSuite({ items, cost, copy, language }: { items: ReturnType<typeof buildDfmItems>; cost: number; copy: SuiteCopy; language: Language }) {
+  const localizedItems = items.map((item) => translateDfmItem(item, language));
+
   return (
     <>
       <div className="stage-suite__table">
-        {items.map((item) => (
+        {localizedItems.map((item) => (
           <span className={item.status === 'Warning' ? 'is-warning' : ''} key={item.label}>
             {item.label}: {statusName(item.status, language)} — {item.note}
           </span>
@@ -131,45 +133,111 @@ function Chart({ title, items }: { title: string; items: { label: string; percen
 }
 
 function translateChartItems(items: { label: string; percent: number }[], language: Language) {
-  if (language !== 'ru') return items;
-  return items.map((item) => ({ ...item, label: chartLabel(item.label) }));
+  return items.map((item) => ({ ...item, label: chartLabel(item.label, language) }));
 }
 
-function chartLabel(label: string) {
-  if (label === 'Payload') return 'Полезная нагрузка';
-  if (label === 'Energy') return 'Энергия';
-  if (label === 'Propulsion') return 'Тяга';
-  if (label === 'Structure') return 'Конструкция';
-  if (label === 'Avionics') return 'Авионика';
-  if (label === 'Reserve') return 'Резерв';
-  return label;
+function chartLabel(label: string, language: Language) {
+  const labels = {
+    kk: { Payload: 'Пайдалы жүк', Energy: 'Энергия', Propulsion: 'Тарту', Structure: 'Құрылым', Avionics: 'Авионика', Reserve: 'Резерв' },
+    ru: { Payload: 'Полезная нагрузка', Energy: 'Энергия', Propulsion: 'Тяга', Structure: 'Конструкция', Avionics: 'Авионика', Reserve: 'Резерв' },
+    en: { Payload: 'Payload', Energy: 'Energy', Propulsion: 'Propulsion', Structure: 'Structure', Avionics: 'Avionics', Reserve: 'Reserve' },
+  }[language];
+  return labels[label as keyof typeof labels] ?? label;
+}
+
+function translateDfmItem(item: ReturnType<typeof buildDfmItems>[number], language: Language) {
+  if (language === 'en') return item;
+
+  const labels = {
+    kk: {
+      'Минимальная стенка': 'Минималды қабырға',
+      'Доступ инструмента': 'Құрал қолжетімділігі',
+      'Совместимость материалов': 'Материал үйлесімділігі',
+      'NDT контроль': 'NDT бақылауы',
+    },
+    ru: {
+      'Минимальная стенка': 'Минимальная стенка',
+      'Доступ инструмента': 'Доступ инструмента',
+      'Совместимость материалов': 'Совместимость материалов',
+      'NDT контроль': 'NDT контроль',
+    },
+  }[language];
+
+  const notes = {
+    kk: {
+      'Проверить толщину под SLS/SLA.': 'SLS/SLA үшін қабырға қалыңдығын тексеру.',
+      'Геометрия пригодна для выбранного процесса.': 'Геометрия таңдалған процеске жарамды.',
+      'Проверка под ЧПУ, оснастку и фиксацию.': 'ЧПУ, жабдық және бекітуге тексеру.',
+      'Сопоставление материала, соединения и контроля качества.': 'Материал, қосылыс және сапа бақылауын салыстыру.',
+      'Применить метод дефектоскопии из производственных метрик.': 'Өндірістік метрикадағы дефектоскопия әдісін қолдану.',
+    },
+    ru: {
+      'Проверить толщину под SLS/SLA.': 'Проверить толщину под SLS/SLA.',
+      'Геометрия пригодна для выбранного процесса.': 'Геометрия пригодна для выбранного процесса.',
+      'Проверка под ЧПУ, оснастку и фиксацию.': 'Проверка под ЧПУ, оснастку и фиксацию.',
+      'Сопоставление материала, соединения и контроля качества.': 'Сопоставление материала, соединения и контроля качества.',
+      'Применить метод дефектоскопии из производственных метрик.': 'Применить метод дефектоскопии из производственных метрик.',
+    },
+  }[language];
+
+  return {
+    ...item,
+    label: labels[item.label as keyof typeof labels] ?? item.label,
+    note: notes[item.note as keyof typeof notes] ?? item.note,
+  };
 }
 
 function designOptionName(name: string, language: Language) {
-  if (language !== 'ru') return name;
-  if (name === 'Fixed Wing') return 'Самолётная схема';
-  if (name === 'Hybrid VTOL') return 'Гибридный вертикальный взлёт';
-  if (name === 'Multirotor') return 'Мультиротор';
-  if (name === 'CubeSat / Satellite') return 'Кубсат / спутник';
+  if (language === 'kk') {
+    if (name === 'Fixed Wing') return 'Самолёт схемасы';
+    if (name === 'Hybrid VTOL') return 'Гибридті VTOL';
+    if (name === 'Multirotor') return 'Мультиротор';
+    if (name === 'CubeSat / Satellite') return 'Кубсат / спутник';
+  }
+  if (language === 'ru') {
+    if (name === 'Fixed Wing') return 'Самолётная схема';
+    if (name === 'Hybrid VTOL') return 'Гибридный вертикальный взлёт';
+    if (name === 'Multirotor') return 'Мультиротор';
+    if (name === 'CubeSat / Satellite') return 'Кубсат / спутник';
+  }
   return name;
 }
 
 function riskName(risk: string, language: Language) {
-  if (language !== 'ru') return risk;
-  if (risk === 'Low') return 'низкий риск';
-  if (risk === 'Medium') return 'средний риск';
-  if (risk === 'High') return 'высокий риск';
+  if (language === 'kk') {
+    if (risk === 'Low') return 'төмен тәуекел';
+    if (risk === 'Medium') return 'орташа тәуекел';
+    if (risk === 'High') return 'жоғары тәуекел';
+  }
+  if (language === 'ru') {
+    if (risk === 'Low') return 'низкий риск';
+    if (risk === 'Medium') return 'средний риск';
+    if (risk === 'High') return 'высокий риск';
+  }
   return risk;
 }
 
 function statusName(status: string, language: Language) {
-  if (language !== 'ru') return status;
-  if (status === 'Warning') return 'предупреждение';
-  if (status === 'OK') return 'норма';
+  if (language === 'kk') {
+    if (status === 'Warning') return 'ескерту';
+    if (status === 'OK') return 'норма';
+  }
+  if (language === 'ru') {
+    if (status === 'Warning') return 'предупреждение';
+    if (status === 'OK') return 'норма';
+  }
   return status;
 }
 
 function telemetryLabel(key: string, language: Language) {
+  if (language === 'kk') {
+    if (key === 'altitude') return 'БИІКТІК';
+    if (key === 'speed') return 'ЖЫЛДАМДЫҚ';
+    if (key === 'battery') return 'АККУМУЛЯТОР';
+    if (key === 'temperature') return 'ТЕМПЕРАТУРА';
+    if (key === 'vibration') return 'ДІРІЛ';
+    if (key === 'status') return 'СТАТУС';
+  }
   if (language !== 'ru') return key.toUpperCase();
   if (key === 'altitude') return 'ВЫСОТА';
   if (key === 'speed') return 'СКОРОСТЬ';
@@ -181,6 +249,13 @@ function telemetryLabel(key: string, language: Language) {
 }
 
 function telemetryValue(key: string, value: string, language: Language) {
+  if (language === 'kk') {
+    if (key === 'status') return statusName(value, language);
+    return value
+      .replace('km/h', 'км/сағ')
+      .replace('km', 'км')
+      .replace('m', 'м');
+  }
   if (language !== 'ru') return value;
   if (key === 'status') return statusName(value, language);
   return value
@@ -190,9 +265,15 @@ function telemetryValue(key: string, value: string, language: Language) {
 }
 
 function operationAdviceName(advice: string, language: Language) {
-  if (language !== 'ru') return advice;
-  if (advice === 'reduce-load') return 'снизить нагрузку и оставить больший резерв';
-  if (advice === 'thermal-protection') return 'усилить термозащиту и проверить температурный режим';
-  if (advice === 'standard-check') return 'выполнить стандартную проверку перед продолжением';
+  if (language === 'kk') {
+    if (advice === 'reduce-load') return 'жүктемені азайтып, көбірек резерв қалдыру';
+    if (advice === 'thermal-protection') return 'термоқорғанысты күшейтіп, температура режимін тексеру';
+    if (advice === 'standard-check') return 'жалғастыру алдында стандартты тексеріс орындау';
+  }
+  if (language === 'ru') {
+    if (advice === 'reduce-load') return 'снизить нагрузку и оставить больший резерв';
+    if (advice === 'thermal-protection') return 'усилить термозащиту и проверить температурный режим';
+    if (advice === 'standard-check') return 'выполнить стандартную проверку перед продолжением';
+  }
   return advice;
 }

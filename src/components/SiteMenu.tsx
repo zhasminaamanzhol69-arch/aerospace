@@ -14,6 +14,7 @@ const menuText: Record<Language, {
       { href: '/drones', title: 'Дрон түрлері', description: 'Құтқару UAV және қолдану сценарийлері' },
       { href: '/spacecraft', title: 'Ғарыш аппараттары', description: 'CubeSat, Satellite және Payload' },
       { href: '/documents', title: 'Құжат талдауы', description: 'PDF/DOCX, ТУ, ГОСТ, ОСТ' },
+      { href: '/articles', title: 'Фактілер мен мақалалар', description: 'Қысқа aerospace түсіндірмелері' },
     ],
   },
   ru: {
@@ -23,6 +24,7 @@ const menuText: Record<Language, {
       { href: '/drones', title: 'Виды дронов', description: 'Спасательные БПЛА и сценарии применения' },
       { href: '/spacecraft', title: 'Космические аппараты', description: 'Кубсаты, спутники и полезная нагрузка' },
       { href: '/documents', title: 'Анализ документов', description: 'PDF/DOCX, ТУ, ГОСТ, ОСТ' },
+      { href: '/articles', title: 'Факты и статьи', description: 'Короткие aerospace-объяснения' },
     ],
   },
   en: {
@@ -32,6 +34,7 @@ const menuText: Record<Language, {
       { href: '/drones', title: 'Drone Types', description: 'Rescue UAV scenarios' },
       { href: '/spacecraft', title: 'Spacecraft', description: 'CubeSat, Satellite, and Payload' },
       { href: '/documents', title: 'Document Analysis', description: 'PDF/DOCX, specs, standards' },
+      { href: '/articles', title: 'Facts and Articles', description: 'Short aerospace explainers' },
     ],
   },
 };

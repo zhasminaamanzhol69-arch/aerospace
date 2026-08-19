@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Vectori browser logo</title>
+  <desc id="desc">Dark aerospace app icon with an aircraft, satellite, orbit arc, and engineering gear.</desc>
+  <defs>
+    <linearGradient id="tile" x1="76" y1="54" x2="438" y2="462" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#162A40"/>
+      <stop offset="0.55" stop-color="#07111F"/>
+      <stop offset="1" stop-color="#0B1B35"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="264" y1="262" x2="462" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1137B8"/>
+      <stop offset="1" stop-color="#0EA5E9"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="178" y1="204" x2="318" y2="384" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#8EA0B6"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#020617" flood-opacity="0.65"/>
+    </filter>
+    <filter id="cyanGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.133 0 0 0 0 0.827 0 0 0 0 0.933 0 0 0 0.8 0"/>
+      <feBlend in="SourceGraphic"/>
+    </filter>
+    <clipPath id="rounded">
+      <rect x="44" y="44" width="424" height="424" rx="72"/>
+    </clipPath>
+  </defs>
+
+  <rect width="512" height="512" fill="#020712"/>
+  <g filter="url(#softShadow)">
+    <rect x="44" y="44" width="424" height="424" rx="72" fill="url(#tile)" stroke="#314158" stroke-width="2"/>
+    <g clip-path="url(#rounded)" opacity="0.28">
+      <path d="M0 96h512M0 160h512M0 224h512M0 288h512M0 352h512M0 416h512M96 0v512M160 0v512M224 0v512M288 0v512M352 0v512M416 0v512" stroke="#476581" stroke-width="1"/>
+    </g>
+  </g>
+
+  <path d="M98 390C92 273 190 116 364 82" fill="none" stroke="#F8FAFC" stroke-width="16" stroke-linecap="round"/>
+  <path d="M132 382C102 315 124 264 196 219" fill="none" stroke="#64748B" stroke-width="8" stroke-linecap="round" opacity="0.72"/>
+
+  <g transform="translate(132 172) rotate(-24)" fill="#F8FAFC">
+    <path d="M18 60l116-26c17-4 31 5 33 17 2 13-9 25-26 29L25 106 4 93l58-26L0 43z"/>
+    <path d="M72 90l19 54-16 9-37-50z"/>
+    <path d="M99 84l48 38-11 15-60-32z"/>
+  </g>
+
+  <g transform="translate(300 104) rotate(42)">
+    <rect x="35" y="14" width="42" height="42" rx="8" fill="#A5B4FC"/>
+    <rect x="2" y="20" width="28" height="30" fill="#818CF8"/>
+    <rect x="82" y="20" width="28" height="30" fill="#818CF8"/>
+    <path d="M56 56v34" stroke="#93C5FD" stroke-width="6" stroke-linecap="round"/>
+    <path d="M35 84h42" stroke="#93C5FD" stroke-width="6" stroke-linecap="round"/>
+    <path d="M56 90l-18 22h36z" fill="#94A3B8"/>
+  </g>
+
+  <path d="M216 420l94-178 30 44 44-54c48 8 82 48 82 96 0 69-70 118-161 107z" fill="url(#blue)" stroke="#38BDF8" stroke-width="5"/>
+  <circle cx="414" cy="232" r="18" fill="#22D3EE" filter="url(#cyanGlow)"/>
+
+  <path d="M160 416l112-182 30 54 28-35-29-54-126 206z" fill="url(#metal)"/>
+  <path d="M292 376h64l40 36m-72-36v-34m32 34v-45m-64 45l34-34m30 34l-31-34" fill="none" stroke="#38BDF8" stroke-width="5" opacity="0.38"/>
+  <path d="M378 374a38 38 0 1 0 58 32h-22a16 16 0 1 1-24-14z" fill="#38BDF8" opacity="0.55"/>
+
+  <path d="M409 118l5 15 15 5-15 5-5 15-5-15-15-5 15-5z" fill="#C4B5FD"/>
+  <circle cx="364" cy="100" r="2.5" fill="#A5B4FC"/>
+  <circle cx="421" cy="143" r="2.5" fill="#A5B4FC"/>
+  <circle cx="292" cy="156" r="2.5" fill="#A5B4FC"/>
+</svg>
