@@ -94,6 +94,7 @@
 }
 
 .reviews-section__demo-window {
+  max-width: 100%;
   overflow: hidden;
   padding-bottom: 6px;
 }
@@ -116,6 +117,7 @@
   display: grid;
   flex: 0 0 min(280px, 82vw);
   gap: 8px;
+  min-width: 0;
   padding: 14px;
 }
 
